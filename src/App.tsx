@@ -1,7 +1,6 @@
 import React from 'react';
 import { ThemeProvider } from 'theme-ui'
-import './App.css';
-import theme from './api/components/theme';
+import theme from './components/theme';
 
 export function App() {
   return (
@@ -9,5 +8,3 @@ export function App() {
     </ThemeProvider>
   );
 }
-
-export default App;

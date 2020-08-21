@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import paper from 'paper';
 
-import { App } from '../App';
+import { App } from './App';
 import { store } from './store';
 
 export function Setup() {

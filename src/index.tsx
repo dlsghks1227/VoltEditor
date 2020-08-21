@@ -1,9 +1,10 @@
-import './index.css';
+import './index.scss';
 
-import { Setup } from './api/setup';
-import { DrawBackground } from './api/background';
-
+import { Setup } from './setup';
+import { BackgroundRender } from './background';
+import { UIRender } from './ui';
 (async () => {
   await Setup();
-  DrawBackground();
+  BackgroundRender();
+  UIRender();
 })();
