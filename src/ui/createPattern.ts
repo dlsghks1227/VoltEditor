@@ -1,16 +1,27 @@
 import paper from 'paper';
 
 type patternOption = {
-    alpha?: number
+  alpha?: number
+  highlightedColor?: paper.Color
+  selectedColor?: paper.Color
+  disabledColor?: paper.Color
 };
 
-export function CreatePattern(item: paper.Raster, onClick: any, options?: patternOption)
-{
-    const alpha = options?.alpha ?? 0.0001;
+export function CreatePattern(item: paper.Raster, iconSize: number, onClick: any, options?: patternOption) {
+  const alpha = options?.alpha ?? 0.0001;
 
-    const group = new paper.Group();
-    group.applyMatrix = false;
+  const group = new paper.Group();
 
-    const pattern = new paper.Path.Rectangle(new paper.Point(0, 0));
-    group.addChildren([pattern, item]);
+  const pattern = new paper.Path.Circle(new paper.Point(0, 0), iconSize);
+  group.applyMatrix = false;
+  group.addChildren([pattern, item]);
+
+  item.on('load', () => {
+    item.size = new paper.Size(400, 300);
+    item.position = paper.view.center;
+  });
+
+  console.log(paper.view.center);
+
+  return group;
 }

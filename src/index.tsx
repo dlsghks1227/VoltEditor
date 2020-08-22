@@ -1,10 +1,10 @@
 import './index.scss';
 
 import { Setup } from './setup';
-import { BackgroundRender } from './background';
-import { UIRender } from './ui';
+import { Draws } from './draws';
+
+
 (async () => {
   await Setup();
-  BackgroundRender();
-  UIRender();
+  Draws();
 })();
