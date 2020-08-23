@@ -6,5 +6,6 @@ import { Draws } from './draws';
 
 (async () => {
   await Setup();
+  
   Draws();
 })();
