@@ -1,15 +1,17 @@
 // @ts-nocheck
 import paper, { view } from 'paper';
-import { 
+
+import {
     horizontalBlocks,
     horizontalBlockSize,
-    verticaBlocks
- } from './constants';
+    verticalBlocks,
+    verticalBlockSize,
+} from './constants';
 
 export const layers: Record<
     | 'backgroundLayer'
     | 'gridLayer'
-    | 'tileLayer' 
+    | 'tileLayer'
     | 'uiLayer',
     paper.Layer
 > = {};
@@ -26,30 +28,35 @@ export function initLayers() {
     layers.tileLayer = new paper.Layer();
     layers.tileLayer.applyMatrix = false;
 
+    const tileBackground = new paper.Path.Rectangle(
+        new paper.Rectangle(
+            new paper.Point(0, 0),
+            new paper.Point(horizontalBlocks * horizontalBlockSize, verticalBlocks * verticalBlockSize)
+        )
+    );
+    tileBackground.fillColor = new paper.Color(1, 1, 1, 0.00001);
+    layers.tileLayer.addChild(tileBackground);
+
     layers.uiLayer = new paper.Layer();
     layers.uiLayer.applyMatrix = false;
 
-    //layers.uiLayer.scaling = new paper.Point(0.5, 0.5);
-    layers.tileLayer.pivot = new paper.Point(0, 0);
-    layers.gridLayer.pivot = new paper.Point(0, 0);
+    layers.uiLayer.pivot = new paper.Point(0, 0);
+    layers.gridLayer.pivot = new paper.Point(
+        (horizontalBlocks * horizontalBlockSize) / 2,
+        (verticalBlocks * verticalBlockSize) / 2);
+
+    layers.tileLayer.pivot = new paper.Point(
+        (horizontalBlocks * horizontalBlockSize) / 2,
+        (verticalBlocks * verticalBlockSize) / 2);
 }
 
-let width = 0;
-let height = 0;
-let marginX = 0;
-let marginY = 0;
 export function resizeLayers() {
-    const screenRatio = paper.view.size.width / paper.view.size.height;
-
-    const viewWidth = paper.view.size.width * paper.view.scaling.x;
-    const viewHeight = paper.view.size.height * paper.view.scaling.y;
-
-    marginX = paper.view.size.width * 0.1;
-    marginY = paper.view.size.height * 0.1;
-
-    layers.gridLayer.position = new paper.Point(marginX, marginY);
+    layers.gridLayer.position = paper.view.center;
     layers.gridLayer.scaling = new paper.Point(1, 1);
 
-    layers.tileLayer.position = new paper.Point(marginX, marginY);
+    layers.tileLayer.position = paper.view.center;
     layers.tileLayer.scaling = new paper.Point(1, 1);
+
+    layers.uiLayer.position = new paper.Point(paper.view.center.x, paper.view.size.height - 75);
+    layers.uiLayer.scaling = new paper.Point(1, 1);
 }

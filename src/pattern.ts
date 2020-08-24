@@ -1,6 +1,7 @@
 import { AsyncObject } from './api/asyncObject';
-import color from './img/tool-color.png'
-import flower from './img/tool-flower.png'
+import color from './img/tool-color.png';
+import flower from './img/tool-flower.png';
+import amenities from './img/tool-amenities.png';
 
 export const patternList = new AsyncObject();
 patternList.value = {
@@ -12,7 +13,9 @@ patternList.value = {
         img: flower,
     },
 
-
+    pattern_3: {
+        img: amenities,
+    },
 }
 
 export function load() {

@@ -3,7 +3,7 @@ import paper from 'paper';
 import { eventEmitter } from './api/eventEmitter';
 
 import { DrawBackground } from './background';
-import { DrawGrid } from './grid'
+import { DrawGrid } from './Grid'
 import { DrawUI } from './ui';
 import { playerState } from './state';
 import { initLayers, layers, resizeLayers } from './layers';
@@ -43,15 +43,14 @@ export function Draws()
     }
 
     initLayers();
+    resizeLayers();
     
     DrawBackground();
     DrawUI();
     DrawGrid();
-    
 
     paper.view.onResize = onResize;
     paper.view.onFrame = onFrame;
-
 
     layers.uiLayer.activate();
     resizeLayers();

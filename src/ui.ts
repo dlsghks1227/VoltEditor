@@ -1,19 +1,25 @@
-import paper, { Point, PaperScope } from 'paper';
+import paper from 'paper';
 
 import * as pattern from './pattern';
 import { layers } from './layers';
 import { objectMap } from './api/asyncObject';
 import { playerState } from './state';
+import {
+    horizontalBlockSize,
+    verticalBlockSize
+} from './constants'
 
 
 export function createObjectIcon(item: any) {
     const icon = item.icon.clone({ insert: false });
+    icon.scaling = new paper.Point(64 / icon.size.width, 64 / icon.size.height);
     return icon;
 }
 
 export function createPattern(item: any) {
     const pattern = new paper.Raster(item.img);
-    pattern.pivot = new Point(-pattern.size.width / 2, -pattern.size.height / 2);
+    pattern.pivot = new paper.Point(0, 0);
+    pattern.scaling = new paper.Point(64 / pattern.size.width, 64 / pattern.size.height);
     pattern.visible = false;
     return pattern;
 }
@@ -24,7 +30,7 @@ type buttonOptions = {
     selectedColor?: paper.Color
     disabledColor?: paper.Color
 };
-export function createButton(item: any, buttonSize: number, onClick: any, options?: buttonOptions) {
+export function createButton(item: any, onClick: any, options?: buttonOptions) {
     layers.uiLayer.activate();
     const alpha = options?.alpha ?? 0.0001;
     const highlightedColor = options?.highlightedColor?.clone() ?? new paper.Color('#eee9a9');
@@ -125,7 +131,9 @@ export function createButton(item: any, buttonSize: number, onClick: any, option
 
 export function createPatternUI(item: any): paper.Group {
     layers.uiLayer.activate();
-    let pos = 0;
+    const itemLen = Object.keys(item).length;
+    console.log(itemLen);
+    let pos = -(itemLen * horizontalBlockSize);
 
     const group = new paper.Group();
 
@@ -134,8 +142,8 @@ export function createPatternUI(item: any): paper.Group {
     path.strokeWidth = 130;
     path.strokeCap = 'round';
     path.segments = [
-        new paper.Segment(new paper.Point(10, 10)),
-        new paper.Segment(new paper.Point(1000, 10)),
+        new paper.Segment(new paper.Point(-(itemLen * horizontalBlockSize), 0)),
+        new paper.Segment(new paper.Point( (itemLen * horizontalBlockSize), 0)),
     ]
 
     group.addChild(path);
@@ -143,10 +151,9 @@ export function createPatternUI(item: any): paper.Group {
     objectMap(item, (def: any) => {
         def.position = new paper.Point(pos, 0);
         group.addChild(def);
-        pos += 100;
+        pos += (itemLen * horizontalBlockSize);
     });
 
-    group.position = new paper.Point(paper.view.center.x, paper.view.size.height - 50);
     return group
 }
 
@@ -156,7 +163,7 @@ function init() {
             layers.gridLayer.activate();
             const icon = createObjectIcon(def);
             const pattern = createPattern(def);
-            return createButton(icon, 20, () => playerState.switchPattern(pattern));
+            return createButton(icon, () => playerState.switchPattern(pattern));
         }));
     });
 }
@@ -165,6 +172,5 @@ export function DrawUI() {
     layers.uiLayer.activate();
     pattern.load();
 
-   //createPatternUI();
     init();
 }

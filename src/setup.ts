@@ -6,6 +6,14 @@ import { App } from './App';
 import { store } from './store';
 
 import { saveTileToFile } from './save';
+import { layers } from './layers';
+import {
+    horizontalBlocks,
+    verticalBlocks,
+    horizontalBlockSize,
+    verticalBlockSize
+} from './constants'
+import { playerState } from './state';
 
 export function Setup() {
     return new Promise((resolve) => {
@@ -17,10 +25,25 @@ export function Setup() {
             store.canvas = canvas;
 
             // @ts-ignore
-            paper.view.onKeyDown = function(event: any) {
+            paper.view.onKeyDown = function (event: any) {
                 switch (event.key) {
                     case 's':
-                        //saveTileToFile();
+                        layers.tileLayer.removeChildren();
+                        const tileBackground = new paper.Path.Rectangle(
+                            new paper.Rectangle(
+                                new paper.Point(0, 0),
+                                new paper.Point(horizontalBlocks * horizontalBlockSize, verticalBlocks * verticalBlockSize)
+                            )
+                        );
+                        tileBackground.fillColor = new paper.Color(1, 1, 1, 0.00001);
+                        layers.tileLayer.addChild(tileBackground);
+                        break;
+                    case 'a':
+                        saveTileToFile();
+                        break;
+
+                    case 'r':
+                        playerState.onRotate();
                         break;
                 }
             }

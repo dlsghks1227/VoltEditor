@@ -1,5 +1,7 @@
 import paper from 'paper';
 import {
+    horizontalBlocks,
+    verticalBlocks,
     horizontalBlockSize,
     verticalBlockSize
 } from './constants'
@@ -17,19 +19,17 @@ let gridGroup: paper.Group;
 
 function createGrid()
 {
+    layers.gridLayer.activate();
     gridGroup = new paper.Group();
     gridGroup.applyMatrix = false;
     gridGroup.position = new paper.Point(0, 0);
 
     const lines: paper.Path[] = [];
-    const horizontal = paper.view.size.width / horizontalBlockSize;
-    const vertical = paper.view.size.height / verticalBlockSize;
-
-    for (let i = 0; i < horizontal; i++)
+    for (let i = 0; i <= horizontalBlocks; i++)
     {
         const segment = [
             new paper.Point(i * horizontalBlockSize, 0),
-            new paper.Point(i * horizontalBlockSize, paper.view.size.height),
+            new paper.Point(i * horizontalBlockSize, verticalBlockSize * verticalBlocks),
         ]
         const line = new paper.Path(segment);
         line.strokeColor = new paper.Color(1, 1, 1);
@@ -39,11 +39,12 @@ function createGrid()
         lines.push(line);
     }
 
-    for (let i = 0; i < vertical; i++)
+    for (let i = 0; i <= verticalBlocks; i++)
     {
         const segment = [
             new paper.Point(0, i * verticalBlockSize),
-            new paper.Point(paper.view.size.width, i * verticalBlockSize),
+            new paper.Point(
+                horizontalBlockSize * horizontalBlocks, i * verticalBlockSize),
         ]
         const line = new paper.Path(segment);
         line.strokeColor = new paper.Color(1, 1, 1);
@@ -54,10 +55,10 @@ function createGrid()
     }
 
     gridGroup.addChildren(lines);
+    layers.gridLayer.addChild(gridGroup);
 }
 
 export function DrawGrid()
 {   
-    layers.gridLayer.activate();
     createGrid();
 }
