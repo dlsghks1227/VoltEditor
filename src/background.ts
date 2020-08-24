@@ -6,7 +6,7 @@ export function DrawBackground() {
     layers.backgroundLayer.activate();
     
     backgroundRect = new paper.Path();
-    backgroundRect.fillColor = new paper.Color('#0f0f0f');
+    backgroundRect.fillColor = new paper.Color('#AAAAFF');
 
     backgroundRect.segments = [
         new paper.Segment(new paper.Point(0, 0)),

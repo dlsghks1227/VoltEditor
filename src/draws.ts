@@ -6,19 +6,25 @@ import { DrawBackground } from './background';
 import { DrawGrid } from './grid'
 import { DrawUI } from './ui';
 import { playerState } from './state';
-import { initLayers, layers } from './layers';
-import { resizeConnrdinates } from './api/coordinate';
+import { initLayers, layers, resizeLayers } from './layers';
 
 function onResize(event: any)
 {
     DrawBackground();
-    resizeConnrdinates();
+    resizeLayers();
 
     eventEmitter.emit("resize", event);
 }
 
+let prevViewMatrix: paper.Matrix;
 function onFrame(event: any)
 {
+    if (!paper.view.matrix.equals(prevViewMatrix)) {
+        const inverted = paper.view.matrix.invert();
+        layers.backgroundLayer.matrix = inverted;
+
+        prevViewMatrix = paper.view.matrix.clone();
+    }
 }
 
 
@@ -48,5 +54,5 @@ export function Draws()
 
 
     layers.uiLayer.activate();
-    resizeConnrdinates();
+    resizeLayers();
 }

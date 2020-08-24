@@ -1,4 +1,4 @@
-import paper, { Point } from 'paper';
+import paper, { Point, PaperScope } from 'paper';
 
 import * as pattern from './pattern';
 import { layers } from './layers';
@@ -13,7 +13,6 @@ export function createObjectIcon(item: any) {
 
 export function createPattern(item: any) {
     const pattern = new paper.Raster(item.img);
-    pattern.applyMatrix = false;
     pattern.pivot = new Point(-pattern.size.width / 2, -pattern.size.height / 2);
     pattern.visible = false;
     return pattern;
@@ -90,6 +89,7 @@ export function createButton(item: any, buttonSize: number, onClick: any, option
             }
         },
     };
+
     group.onMouseEnter = function () {
         if (group.data.disabled) {
             return;
@@ -123,24 +123,41 @@ export function createButton(item: any, buttonSize: number, onClick: any, option
     return group;
 }
 
-export function createPatternUI(items: any): paper.Group {
+export function createPatternUI(item: any): paper.Group {
+    layers.uiLayer.activate();
+    let pos = 0;
+
     const group = new paper.Group();
+
+    const path = new paper.Path();
+    path.strokeColor = new paper.Color('white');
+    path.strokeWidth = 130;
+    path.strokeCap = 'round';
+    path.segments = [
+        new paper.Segment(new paper.Point(10, 10)),
+        new paper.Segment(new paper.Point(1000, 10)),
+    ]
+
+    group.addChild(path);
+
+    objectMap(item, (def: any) => {
+        def.position = new paper.Point(pos, 0);
+        group.addChild(def);
+        pos += 100;
+    });
+
+    group.position = new paper.Point(paper.view.center.x, paper.view.size.height - 50);
     return group
 }
 
 function init() {
     pattern.patternList.getAsyncValue((item: any) => {
-        const t = objectMap(item, (def: any) => {
+        const patternUI = createPatternUI(objectMap(item, (def: any) => {
             layers.gridLayer.activate();
             const icon = createObjectIcon(def);
             const pattern = createPattern(def);
             return createButton(icon, 20, () => playerState.switchPattern(pattern));
-        });
-        let pos = 110;
-        objectMap(t, (def: any) => {
-            def.position = new paper.Point(pos, 100);
-            pos += 100;
-        })
+        }));
     });
 }
 
@@ -148,5 +165,6 @@ export function DrawUI() {
     layers.uiLayer.activate();
     pattern.load();
 
+   //createPatternUI();
     init();
 }

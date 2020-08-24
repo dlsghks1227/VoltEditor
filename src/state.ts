@@ -19,17 +19,21 @@ class PlayerState {
     }
 
     onUp(event: any) {
-        layers.tileLayer.activate();
         if (this.activePattern) {
+            layers.tileLayer.activate();
             const group = new paper.Group();
+            const pos = layers.gridLayer.globalToLocal(event.point);
+
+            group.position = pos;
             group.addChild(this.activePattern.clone());
         }
     }
 
     onMove(event: any) {
-        layers.tileLayer.activate();
         if (this.activePattern) {
-            this.activePattern.position = getWorldPositionToGrid(event.point).multiply(new paper.Point(horizontalBlockSize, verticalBlockSize));
+            layers.tileLayer.activate();
+            const pos = layers.gridLayer.globalToLocal(event.point);
+            this.activePattern.position = getWorldPositionToGrid(pos).multiply(new paper.Point(horizontalBlockSize, verticalBlockSize));
         }
     }
 }
