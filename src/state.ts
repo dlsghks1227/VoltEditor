@@ -1,5 +1,5 @@
 // @ts-nocheck
-import paper, { Color } from 'paper';
+import paper from 'paper';
 import test from './sound/Windows User Account Control.wav'
 
 import { getWorldPositionToGrid } from './api/coordinate';
@@ -73,11 +73,26 @@ class PlayerState {
         }
     }
 
-    onRotate() {
+    onRotate(angle: number) {
         if (this.activePattern) {
             layers.tileLayer.activate();
-            this.activePattern.rotate(90);
+            this.activePattern.rotate(angle);
         }
+    }
+
+    onFilp(isVertical: Boolean) {
+    }
+
+    onReset() {
+        layers.tileLayer.removeChildren();
+        const tileBackground = new paper.Path.Rectangle(
+            new paper.Rectangle(
+                new paper.Point(0, 0),
+                new paper.Point(horizontalBlocks * horizontalBlockSize, verticalBlocks * verticalBlockSize)
+            )
+        );
+        tileBackground.fillColor = new paper.Color(1, 1, 1, 0.00001);
+        layers.tileLayer.addChild(tileBackground);
     }
 }
 

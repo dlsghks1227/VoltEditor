@@ -6,7 +6,6 @@ import { objectMap } from './api/asyncObject';
 import { playerState } from './state';
 import {
     horizontalBlockSize,
-    verticalBlockSize
 } from './constants'
 
 
@@ -31,7 +30,6 @@ type buttonOptions = {
     disabledColor?: paper.Color
 };
 export function createButton(item: any, onClick: any, options?: buttonOptions) {
-    layers.uiLayer.activate();
     const alpha = options?.alpha ?? 0.0001;
     const highlightedColor = options?.highlightedColor?.clone() ?? new paper.Color('#eee9a9');
     const selectedColor = options?.selectedColor?.clone() ?? new paper.Color('#f8bd26');
@@ -129,7 +127,7 @@ export function createButton(item: any, onClick: any, options?: buttonOptions) {
     return group;
 }
 
-export function createPatternUI(item: any): paper.Group {
+export function createPatternUI(item: any, position: paper.Point): paper.Group {
     layers.uiLayer.activate();
     const itemLen = Object.keys(item).length;
     console.log(itemLen);
@@ -143,10 +141,11 @@ export function createPatternUI(item: any): paper.Group {
     path.strokeCap = 'round';
     path.segments = [
         new paper.Segment(new paper.Point(-(itemLen * horizontalBlockSize), 0)),
-        new paper.Segment(new paper.Point( (itemLen * horizontalBlockSize), 0)),
+        new paper.Segment(new paper.Point((itemLen * horizontalBlockSize), 0)),
     ]
-
+    group.applyMatrix = false;
     group.addChild(path);
+    group.position = position;
 
     objectMap(item, (def: any) => {
         def.position = new paper.Point(pos, 0);
@@ -163,8 +162,9 @@ function init() {
             layers.gridLayer.activate();
             const icon = createObjectIcon(def);
             const pattern = createPattern(def);
+            layers.uiLayer.activate();
             return createButton(icon, () => playerState.switchPattern(pattern));
-        }));
+        }), new paper.Point(paper.view.center.x, paper.view.size.height - 75));
     });
 }
 
@@ -173,4 +173,49 @@ export function DrawUI() {
     pattern.load();
 
     init();
+
+    layers.buttonLayer.activate();
+    const saveButton = new paper.Path.Rectangle(
+        new paper.Rectangle(
+            new paper.Point(-25, -25),
+            new paper.Point(25, 25)
+        )
+    );
+    saveButton.fillColor = new paper.Color(1, 1, 1, 0.1);
+    const saveRaster = createButton(saveButton.rasterize(), () => {});
+    saveRaster.position = new paper.Point(100, 100);
+    saveButton.remove();
+
+    // ---------
+    const resetButton = new paper.Path.Rectangle(
+        new paper.Rectangle(
+            new paper.Point(-25, -25),
+            new paper.Point(25, 25)
+        )
+    );
+    resetButton.fillColor = new paper.Color(1, 1, 1, 0.1);
+    const resetRaster = createButton(resetButton.rasterize(), () => playerState.onReset());
+    resetRaster.position = new paper.Point(100, 200);
+    resetButton.remove();
+
+    // ---------
+    const leftRotationButton = new paper.Path.Rectangle(
+        new paper.Rectangle(
+            new paper.Point(-25, -25),
+            new paper.Point(25, 25)
+        )
+    );
+    leftRotationButton.fillColor = new paper.Color(1, 1, 1, 0.1);
+    const leftRotationRaster = createButton(leftRotationButton.rasterize(), () => {});
+    leftRotationRaster.position = new paper.Point(100, 300);
+    leftRotationButton.remove();
+
+    const RightRotationButton = new paper.Raster();
+    RightRotationButton.position = new paper.Point(0, 0);
+    
+    // 상하
+    const verticalFlip = new paper.Raster();
+
+    // 좌우
+    const HorizontalFlip = new paper.Raster();
 }

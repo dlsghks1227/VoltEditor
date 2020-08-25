@@ -12,7 +12,8 @@ export const layers: Record<
     | 'backgroundLayer'
     | 'gridLayer'
     | 'tileLayer'
-    | 'uiLayer',
+    | 'uiLayer'
+    | 'buttonLayer',
     paper.Layer
 > = {};
 
@@ -38,9 +39,11 @@ export function initLayers() {
     layers.tileLayer.addChild(tileBackground);
 
     layers.uiLayer = new paper.Layer();
-    layers.uiLayer.applyMatrix = false;
+    //layers.uiLayer.applyMatrix = false;
 
-    layers.uiLayer.pivot = new paper.Point(0, 0);
+    layers.buttonLayer = new paper.Layer();
+    layers.buttonLayer.applyMatrix = false;
+
     layers.gridLayer.pivot = new paper.Point(
         (horizontalBlocks * horizontalBlockSize) / 2,
         (verticalBlocks * verticalBlockSize) / 2);
@@ -48,6 +51,10 @@ export function initLayers() {
     layers.tileLayer.pivot = new paper.Point(
         (horizontalBlocks * horizontalBlockSize) / 2,
         (verticalBlocks * verticalBlockSize) / 2);
+
+    layers.uiLayer.pivot = new paper.Point(
+        paper.view.size.width / 2,
+        paper.view.size.height / 2);
 }
 
 export function resizeLayers() {
@@ -57,6 +64,6 @@ export function resizeLayers() {
     layers.tileLayer.position = paper.view.center;
     layers.tileLayer.scaling = new paper.Point(1, 1);
 
-    layers.uiLayer.position = new paper.Point(paper.view.center.x, paper.view.size.height - 75);
+    layers.uiLayer.position = new paper.Point(paper.view.center.x, paper.view.size.height);
     layers.uiLayer.scaling = new paper.Point(1, 1);
 }

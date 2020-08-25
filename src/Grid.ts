@@ -32,7 +32,7 @@ function createGrid()
             new paper.Point(i * horizontalBlockSize, verticalBlockSize * verticalBlocks),
         ]
         const line = new paper.Path(segment);
-        line.strokeColor = new paper.Color(1, 1, 1);
+        line.strokeColor = new paper.Color(1, 1, 1, 0.5);
         line.strokeWidth = 1;
         line.strokeCap = 'round';
         line.opacity = 1;
@@ -47,7 +47,7 @@ function createGrid()
                 horizontalBlockSize * horizontalBlocks, i * verticalBlockSize),
         ]
         const line = new paper.Path(segment);
-        line.strokeColor = new paper.Color(1, 1, 1);
+        line.strokeColor = new paper.Color(1, 1, 1, 0.5);
         line.strokeWidth = 1;
         line.strokeCap = 'round';
         line.opacity = 1;

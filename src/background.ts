@@ -4,7 +4,10 @@ import { layers } from './layers';
 let backgroundRect: paper.Path;
 export function DrawBackground() {
     layers.backgroundLayer.activate();
-    
+    if (backgroundRect)
+    {
+        backgroundRect.remove();
+    }
     backgroundRect = new paper.Path();
     backgroundRect.fillColor = new paper.Color('#AAAAFF');
 
