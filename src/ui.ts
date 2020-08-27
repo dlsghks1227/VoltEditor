@@ -127,7 +127,7 @@ export function createButton(item: any, onClick: any, options?: buttonOptions) {
     return group;
 }
 
-export function createPatternUI(item: any, position: paper.Point): paper.Group {
+export function createPatternUI(item: any): paper.Group {
     layers.uiLayer.activate();
     const itemLen = Object.keys(item).length;
     console.log(itemLen);
@@ -145,7 +145,6 @@ export function createPatternUI(item: any, position: paper.Point): paper.Group {
     ]
     group.applyMatrix = false;
     group.addChild(path);
-    group.position = position;
 
     objectMap(item, (def: any) => {
         def.position = new paper.Point(pos, 0);
@@ -164,7 +163,7 @@ function init() {
             const pattern = createPattern(def);
             layers.uiLayer.activate();
             return createButton(icon, () => playerState.switchPattern(pattern));
-        }), new paper.Point(paper.view.center.x, paper.view.size.height - 75));
+        }));
     });
 }
 
@@ -177,12 +176,13 @@ export function DrawUI() {
     layers.buttonLayer.activate();
     const saveButton = new paper.Path.Rectangle(
         new paper.Rectangle(
-            new paper.Point(-25, -25),
-            new paper.Point(25, 25)
-        )
+            new paper.Point(-10, -10),
+            new paper.Point(10, 10)
+        ),
     );
     saveButton.fillColor = new paper.Color(1, 1, 1, 0.1);
-    const saveRaster = createButton(saveButton.rasterize(), () => {});
+    const test = saveButton.rasterize();
+    const saveRaster = createButton(test, () => {});
     saveRaster.position = new paper.Point(100, 100);
     saveButton.remove();
 
@@ -206,16 +206,43 @@ export function DrawUI() {
         )
     );
     leftRotationButton.fillColor = new paper.Color(1, 1, 1, 0.1);
-    const leftRotationRaster = createButton(leftRotationButton.rasterize(), () => {});
+    const leftRotationRaster = createButton(leftRotationButton.rasterize(), () => playerState.onRotate(90));
     leftRotationRaster.position = new paper.Point(100, 300);
     leftRotationButton.remove();
 
-    const RightRotationButton = new paper.Raster();
-    RightRotationButton.position = new paper.Point(0, 0);
+    const rightRotationButton = new paper.Path.Rectangle(
+        new paper.Rectangle(
+            new paper.Point(-25, -25),
+            new paper.Point(25, 25)
+        )
+    );
+    rightRotationButton.fillColor = new paper.Color(1, 1, 1, 0.1);
+    const rightRotationRaster = createButton(leftRotationButton.rasterize(), () => playerState.onRotate(-90));
+    rightRotationRaster.position = new paper.Point(100, 400);
+    rightRotationButton.remove();
+    
     
     // 상하
-    const verticalFlip = new paper.Raster();
+    const verticalFlipButton = new paper.Path.Rectangle(
+        new paper.Rectangle(
+            new paper.Point(-25, -25),
+            new paper.Point(25, 25)
+        )
+    );
+    verticalFlipButton.fillColor = new paper.Color(1, 1, 1, 0.1);
+    const verticalFlipRaster = createButton(leftRotationButton.rasterize(), () => playerState.onFilp(true));
+    verticalFlipRaster.position = new paper.Point(100, 500);
+    verticalFlipButton.remove();
 
     // 좌우
-    const HorizontalFlip = new paper.Raster();
+    const horizontalFlipButton = new paper.Path.Rectangle(
+        new paper.Rectangle(
+            new paper.Point(-25, -25),
+            new paper.Point(25, 25)
+        )
+    );
+    horizontalFlipButton.fillColor = new paper.Color(1, 1, 1, 0.1);
+    const horizontalFlipRaster = createButton(leftRotationButton.rasterize(), () => playerState.onFilp(false));
+    horizontalFlipRaster.position = new paper.Point(100, 600);
+    horizontalFlipButton.remove();
 }

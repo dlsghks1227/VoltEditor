@@ -34,7 +34,9 @@ class PlayerState {
         ptn.position = pos
         .multiply(new paper.Point(horizontalBlockSize, verticalBlockSize))
         .add(
-            new paper.Point((pattern.size.width / 2) * pattern.scaling.x, (pattern.size.height / 2) * pattern.scaling.y)
+            new paper.Point(
+                (pattern.size.width / 2) *  ((pattern.scaling.x > 0) ? pattern.scaling.x : -pattern.scaling.x), 
+                (pattern.size.height / 2) * ((pattern.scaling.y > 0) ? pattern.scaling.y : -pattern.scaling.y))
         );
         this.tile[pos.x + (pos.y * horizontalBlocks)] = ptn;
         layers.tileLayer.addChild(ptn);
@@ -44,9 +46,6 @@ class PlayerState {
     }
 
     onUp(event: any) {
-        audio.pause();
-        audio.currentTime = 0;
-        audio.play();
         if (this.activePattern && !this.isButtonDown) {
             const pos = getWorldPositionToGrid(layers.gridLayer.globalToLocal(event.point));
             if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
@@ -67,8 +66,7 @@ class PlayerState {
         if (this.activePattern && !this.isButtonDown) {
             layers.tileLayer.activate();
             this.activePattern.visible = true;
-            const pos = layers.gridLayer
-            .globalToLocal(event.point)
+            const pos = layers.gridLayer.globalToLocal(event.point)
             this.activePattern.position = pos;
         }
     }
@@ -81,6 +79,17 @@ class PlayerState {
     }
 
     onFilp(isVertical: Boolean) {
+        if (this.activePattern) {
+            layers.tileLayer.activate();
+            if (isVertical)
+            {
+                this.activePattern.scale(new paper.Point(1, -1));
+            }
+            else
+            {
+                this.activePattern.scale(new paper.Point(-1, 1));
+            }
+        }
     }
 
     onReset() {

@@ -1,5 +1,5 @@
 // @ts-nocheck
-import paper, { view } from 'paper';
+import paper, { view, Color } from 'paper';
 
 import {
     horizontalBlocks,
@@ -21,8 +21,6 @@ export function initLayers() {
     layers.backgroundLayer = paper.project.activeLayer;
     layers.backgroundLayer.applyMatrix = false;
 
-    //layers.uiLayer.pivot = new paper.Point(0, 0);
-
     layers.gridLayer = new paper.Layer();
     layers.gridLayer.applyMatrix = false;
 
@@ -39,7 +37,7 @@ export function initLayers() {
     layers.tileLayer.addChild(tileBackground);
 
     layers.uiLayer = new paper.Layer();
-    //layers.uiLayer.applyMatrix = false;
+    layers.uiLayer.applyMatrix = false;
 
     layers.buttonLayer = new paper.Layer();
     layers.buttonLayer.applyMatrix = false;
@@ -52,18 +50,37 @@ export function initLayers() {
         (horizontalBlocks * horizontalBlockSize) / 2,
         (verticalBlocks * verticalBlockSize) / 2);
 
-    layers.uiLayer.pivot = new paper.Point(
-        paper.view.size.width / 2,
-        paper.view.size.height / 2);
+    layers.uiLayer.pivot = new paper.Point(0, 0);
+
+    layers.buttonLayer.pivot = new paper.Point(0, 0);
 }
 
+let scaleX = 1;
+let scaleY = 1;
+
 export function resizeLayers() {
+    scaleX = paper.view.size.width / (horizontalBlocks * horizontalBlockSize);
+    scaleY = paper.view.size.height / (verticalBlocks * verticalBlockSize);
+    
+    if (scaleX >= 1) scaleX = 1;
+    if (scaleY >= 1) scaleY = 1;
+
+    if (scaleX / scaleY > 1) {
+        scaleX = scaleY;
+    }
+    else {
+        scaleY = scaleX;
+    }
+
     layers.gridLayer.position = paper.view.center;
-    layers.gridLayer.scaling = new paper.Point(1, 1);
+    layers.gridLayer.scaling = new paper.Point(scaleX, scaleY);
 
     layers.tileLayer.position = paper.view.center;
-    layers.tileLayer.scaling = new paper.Point(1, 1);
+    layers.tileLayer.scaling = new paper.Point(scaleX, scaleY);
 
-    layers.uiLayer.position = new paper.Point(paper.view.center.x, paper.view.size.height);
-    layers.uiLayer.scaling = new paper.Point(1, 1);
+    layers.uiLayer.position = new paper.Point(paper.view.center.x, paper.view.size.height - (scaleY * 75));
+    layers.uiLayer.scaling = new paper.Point(scaleX, scaleY);
+
+    layers.buttonLayer.scaling = new paper.Point(scaleX, scaleY);
+
 }
