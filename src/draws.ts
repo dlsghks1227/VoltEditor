@@ -22,8 +22,7 @@ function onFrame(event: any)
     if (!paper.view.matrix.equals(prevViewMatrix)) {
         const inverted = paper.view.matrix.invert();
         layers.backgroundLayer.matrix = inverted;
-        layers.buttonLayer.matrix = inverted;
-
+        
         prevViewMatrix = paper.view.matrix.clone();
     }
 }

@@ -7,6 +7,9 @@ import { playerState } from './state';
 import {
     horizontalBlockSize,
 } from './constants'
+import { saveTileToFile } from './save'
+
+import image from './img/tool-amenities.png'
 
 
 export function createObjectIcon(item: any) {
@@ -130,7 +133,6 @@ export function createButton(item: any, onClick: any, options?: buttonOptions) {
 export function createPatternUI(item: any): paper.Group {
     layers.uiLayer.activate();
     const itemLen = Object.keys(item).length;
-    console.log(itemLen);
     let pos = -(itemLen * horizontalBlockSize);
 
     const group = new paper.Group();
@@ -176,27 +178,20 @@ export function DrawUI() {
     layers.buttonLayer.activate();
     const saveButton = new paper.Path.Rectangle(
         new paper.Rectangle(
-            new paper.Point(-10, -10),
-            new paper.Point(10, 10)
+            new paper.Point(-25, -25),
+            new paper.Point(25, 25)
         ),
     );
     saveButton.fillColor = new paper.Color(1, 1, 1, 0.1);
     const test = saveButton.rasterize();
-    const saveRaster = createButton(test, () => {});
+    const saveRaster = createButton(test, () => saveTileToFile());
     saveRaster.position = new paper.Point(100, 100);
     saveButton.remove();
 
     // ---------
-    const resetButton = new paper.Path.Rectangle(
-        new paper.Rectangle(
-            new paper.Point(-25, -25),
-            new paper.Point(25, 25)
-        )
-    );
-    resetButton.fillColor = new paper.Color(1, 1, 1, 0.1);
-    const resetRaster = createButton(resetButton.rasterize(), () => playerState.onReset());
+    const resetButton = new paper.Raster(image);
+    const resetRaster = createButton(resetButton, () => playerState.onReset());
     resetRaster.position = new paper.Point(100, 200);
-    resetButton.remove();
 
     // ---------
     const leftRotationButton = new paper.Path.Rectangle(

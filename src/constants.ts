@@ -1,5 +1,5 @@
-export const horizontalBlocks = 10;
-export const verticalBlocks = 10;
+export const horizontalBlocks = 20;
+export const verticalBlocks = 20;
 
 export const horizontalBlockSize = 64;
 export const verticalBlockSize = 64;

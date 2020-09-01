@@ -51,7 +51,6 @@ export function initLayers() {
         (verticalBlocks * verticalBlockSize) / 2);
 
     layers.uiLayer.pivot = new paper.Point(0, 0);
-
     layers.buttonLayer.pivot = new paper.Point(0, 0);
 }
 
@@ -59,8 +58,8 @@ let scaleX = 1;
 let scaleY = 1;
 
 export function resizeLayers() {
-    scaleX = paper.view.size.width / (horizontalBlocks * horizontalBlockSize);
-    scaleY = paper.view.size.height / (verticalBlocks * verticalBlockSize);
+    scaleX = paper.view.size.width / ((horizontalBlocks * horizontalBlockSize) + 300);
+    scaleY = paper.view.size.height / ((verticalBlocks * verticalBlockSize) + 300);
     
     if (scaleX >= 1) scaleX = 1;
     if (scaleY >= 1) scaleY = 1;
@@ -81,6 +80,7 @@ export function resizeLayers() {
     layers.uiLayer.position = new paper.Point(paper.view.center.x, paper.view.size.height - (scaleY * 75));
     layers.uiLayer.scaling = new paper.Point(scaleX, scaleY);
 
+    layers.buttonLayer.position = new paper.Point(0, 0);
     layers.buttonLayer.scaling = new paper.Point(scaleX, scaleY);
 
 }
