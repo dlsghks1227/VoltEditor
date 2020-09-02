@@ -4,6 +4,7 @@ import paper from 'paper';
 
 import { App } from './App';
 import { store } from './store';
+import { playerState } from './state';
 
 export function Setup() {
     return new Promise((resolve) => {
@@ -17,9 +18,8 @@ export function Setup() {
             // @ts-ignore
             paper.view.onKeyDown = function (event: any) {
                 switch (event.key) {
-                    case 's':
-                        break;
-                    case 'a':
+                    case 'r':
+                        playerState.onRotate(-90);
                         break;
                 }
             }

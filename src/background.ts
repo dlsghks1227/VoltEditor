@@ -9,7 +9,7 @@ export function DrawBackground() {
         backgroundRect.remove();
     }
     backgroundRect = new paper.Path();
-    backgroundRect.fillColor = new paper.Color('#AAAAFF');
+    backgroundRect.fillColor = new paper.Color('#000000');
 
     backgroundRect.segments = [
         new paper.Segment(new paper.Point(0, 0)),

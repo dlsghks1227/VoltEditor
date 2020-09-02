@@ -3,7 +3,6 @@ import {
     horizontalBlockSize,
     verticalBlockSize
 } from '../constants';
-import { layers } from '../layers';
 
 export function getWorldPositionToGrid(
     position: paper.Point,

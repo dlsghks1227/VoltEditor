@@ -1,29 +1,50 @@
 import paper from 'paper';
 
-import * as pattern from './pattern';
+import * as pattern from './tile';
 import { layers } from './layers';
 import { objectMap } from './api/asyncObject';
 import { playerState } from './state';
-import {
-    horizontalBlockSize,
-} from './constants'
-import { saveTileToFile } from './save'
+import { saveTileToFile } from './save';
 
-import image from './img/tool-amenities.png'
+import inven from './img/resources/Inven.png';
+import GuideLine from './img/resources/Guide Line.png';
 
+import ArrowButton from './img/resources/Arrow Button_ Default.png';
+import ResetButton from './img/resources/Reset.png';
+import RotationButton from './img/resources/Rotation.png';
+import PrintButton from './img/resources/Print.png';
+
+import * as sound from './sound';
 
 export function createObjectIcon(item: any) {
+    layers.uiLayer.activate();
+
     const icon = item.icon.clone({ insert: false });
-    icon.scaling = new paper.Point(64 / icon.size.width, 64 / icon.size.height);
     return icon;
 }
 
 export function createPattern(item: any) {
+    layers.patternLayer.activate();
+    const group = new paper.Group();
+
     const pattern = new paper.Raster(item.img);
     pattern.pivot = new paper.Point(0, 0);
-    pattern.scaling = new paper.Point(64 / pattern.size.width, 64 / pattern.size.height);
-    pattern.visible = false;
-    return pattern;
+    pattern.position = item.offset;
+
+    const bound = new paper.Path.Rectangle(
+        new paper.Point(0, 0),
+        new paper.Size(94, 94));
+    bound.strokeColor = new paper.Color('white');
+    bound.strokeColor.alpha = 0;
+    bound.strokeWidth = 0.1;
+    bound.fillColor = new paper.Color('white');
+    bound.fillColor.alpha = 0.0001;
+    bound.position = new paper.Point(0, 0);
+
+    group.addChildren([bound, pattern]);
+    group.visible = false;
+
+    return group;
 }
 
 type buttonOptions = {
@@ -33,11 +54,6 @@ type buttonOptions = {
     disabledColor?: paper.Color
 };
 export function createButton(item: any, onClick: any, options?: buttonOptions) {
-    const alpha = options?.alpha ?? 0.0001;
-    const highlightedColor = options?.highlightedColor?.clone() ?? new paper.Color('#eee9a9');
-    const selectedColor = options?.selectedColor?.clone() ?? new paper.Color('#f8bd26');
-    const disabledColor = options?.disabledColor?.clone() ?? null;
-
     const group = new paper.Group();
 
     const button = new paper.Path.Rectangle(
@@ -49,24 +65,6 @@ export function createButton(item: any, onClick: any, options?: buttonOptions) {
     group.applyMatrix = false;
     group.addChildren([button, item]);
 
-    function updateColor(btn: paper.Path.Circle) {
-        btn.fillColor =
-            (group.data.disabled && disabledColor) ? disabledColor
-                : (group.data.selected || group.data.pressed) ? selectedColor
-                    : highlightedColor;
-
-        if (group.data.selected) {
-            btn.fillColor.alpha = 1;
-        } else if (group.data.pressed) {
-            btn.fillColor.alpha = 0.5;
-        } else if (group.data.hovered) {
-            btn.fillColor.alpha = 1;
-        } else {
-            btn.fillColor.alpha = alpha;
-        }
-    }
-    updateColor(button);
-
     group.data = {
         selected: false,
         hovered: false,
@@ -74,22 +72,18 @@ export function createButton(item: any, onClick: any, options?: buttonOptions) {
         disabled: false,
         select(isSelected: Boolean) {
             group.data.selected = isSelected;
-            updateColor(button);
         },
         hover(isHover: Boolean) {
             group.data.hovered = isHover;
-            updateColor(button);
 
         },
         press(isPressed: Boolean) {
             group.data.pressed = isPressed;
-            updateColor(button);
 
         },
         disable(isDisabled: Boolean) {
             group.data.disabled = isDisabled;
             item.opacity = isDisabled ? 0.5 : 1;
-            updateColor(button);
 
             if (isDisabled) {
                 group.data.hover(false);
@@ -130,114 +124,155 @@ export function createButton(item: any, onClick: any, options?: buttonOptions) {
     return group;
 }
 
-export function createPatternUI(item: any): paper.Group {
+let invenCount: number = 0;
+export function createPatternUI(item: any){
     layers.uiLayer.activate();
     const itemLen = Object.keys(item).length;
-    let pos = -(itemLen * horizontalBlockSize);
+    const background = new paper.Raster(inven);
+    background.position = new paper.Point(0, 0);
 
-    const group = new paper.Group();
+    const leftArrowIcon = new paper.Raster(ArrowButton);
+    const leftArrowRaster = createButton(leftArrowIcon, () => {
 
-    const path = new paper.Path();
-    path.strokeColor = new paper.Color('white');
-    path.strokeWidth = 130;
-    path.strokeCap = 'round';
-    path.segments = [
-        new paper.Segment(new paper.Point(-(itemLen * horizontalBlockSize), 0)),
-        new paper.Segment(new paper.Point((itemLen * horizontalBlockSize), 0)),
-    ]
-    group.applyMatrix = false;
-    group.addChild(path);
+        sound.buttonClick.pause();
+        sound.buttonClick.currentTime = 0;
+        sound.buttonClick.play();
 
-    objectMap(item, (def: any) => {
-        def.position = new paper.Point(pos, 0);
-        group.addChild(def);
-        pos += (itemLen * horizontalBlockSize);
+        if (invenCount > 0){
+            invenCount -= 1;
+        }
+        changeInven(invenCount);
+        if (tileGuideLine)
+        {
+            tileGuideLine.visible = false;
+        }
+
     });
+    leftArrowRaster.position = new paper.Point(-550, 0);
 
-    return group
+    const rightArrowIcon = new paper.Raster(ArrowButton);
+    const rightArrowRaster = createButton(rightArrowIcon, () => {
+
+        sound.buttonClick.pause();
+        sound.buttonClick.currentTime = 0;
+        sound.buttonClick.play();
+
+        if (invenCount < itemLen - 7){
+            invenCount += 1;
+        }
+        
+        changeInven(invenCount);
+
+        if (tileGuideLine)
+        {
+            tileGuideLine.visible = false;
+        }
+
+    });
+    rightArrowRaster.scaling = new paper.Point(-1, 1);
+    rightArrowRaster.position = new paper.Point(550, 0);
+
+    changeInven(0);
+}
+
+let tileButtons: any;
+let tileGuideLine: paper.Raster;
+let invenGroup: paper.Group;
+function changeInven(index: number)
+{
+    layers.uiLayer.activate();
+    objectMap(tileButtons, (def: any) => {
+        def.visible = false;
+    });
+    if (!invenGroup)
+    {
+        invenGroup = new paper.Group();
+    }
+    else
+    {
+        invenGroup.removeChildren();
+    }
+    let pos = -357;
+    //group.applyMatrix = false;
+    for (let i = index + 1; i < index + 8; i++) {
+        const key = 'tile' + i.toString();
+        const tileButton = tileButtons[key];
+        if (!tileButton)
+        {
+            return;
+        }
+        tileButton.visible = true;
+        tileButton.position = new paper.Point(pos, -7);
+        pos += 119;
+        invenGroup.addChild(tileButton);
+    }
 }
 
 function init() {
     pattern.patternList.getAsyncValue((item: any) => {
-        const patternUI = createPatternUI(objectMap(item, (def: any) => {
-            layers.gridLayer.activate();
+        tileButtons = objectMap(item, (def: any) => {
+            const group = new paper.Group();
+
             const icon = createObjectIcon(def);
             const pattern = createPattern(def);
-            layers.uiLayer.activate();
-            return createButton(icon, () => playerState.switchPattern(pattern));
-        }));
-    });
+
+            const bound = new paper.Path.Rectangle(
+                new paper.Point(0, 0),
+                new paper.Size(94, 94));
+            bound.strokeColor = new paper.Color('white');
+            bound.strokeColor.alpha = 0;
+            bound.strokeWidth = 0.1;
+            bound.fillColor = new paper.Color('white');
+            bound.fillColor.alpha = 0;
+            bound.position = icon.position;
+
+            group.addChildren([bound, icon]);      
+
+            const button = createButton(group.rasterize(), () => {
+                playerState.switchPattern(pattern);
+                if (tileGuideLine)
+                {
+                    tileGuideLine.visible = true;
+                    tileGuideLine.position = button.position;
+                }
+            });
+            group.remove();
+            return button;
+        });
+        createPatternUI(tileButtons);
+
+        tileGuideLine = new paper.Raster(GuideLine);
+        tileGuideLine.visible = false;
+        layers.uiLayer.addChild(tileGuideLine);
+    });    
 }
 
 export function DrawUI() {
     layers.uiLayer.activate();
+
     pattern.load();
+    
+    // Rotation Button
+    const rotationIcon = new paper.Raster(RotationButton);
+    const rotationRaster = createButton(rotationIcon, () => playerState.onRotate(-90));
+    rotationRaster.position = new paper.Point(-550, 220);
 
+    // Reset Button
+    const resetIcon = new paper.Raster(ResetButton);
+    const resetRaster = createButton(resetIcon, () => playerState.onReset());
+    resetRaster.position = new paper.Point(550, 1100);
+    
+    // Print Button
+    const printIcon = new paper.Raster(PrintButton);
+    const printRaster = createButton(printIcon, () => {
+
+        sound.printButton.pause();
+        sound.printButton.currentTime = 0;
+        sound.printButton.play();
+
+        saveTileToFile();
+    });
+    printRaster.position = new paper.Point(-550, 1100);
+    
     init();
-
-    layers.buttonLayer.activate();
-    const saveButton = new paper.Path.Rectangle(
-        new paper.Rectangle(
-            new paper.Point(-25, -25),
-            new paper.Point(25, 25)
-        ),
-    );
-    saveButton.fillColor = new paper.Color(1, 1, 1, 0.1);
-    const test = saveButton.rasterize();
-    const saveRaster = createButton(test, () => saveTileToFile());
-    saveRaster.position = new paper.Point(100, 100);
-    saveButton.remove();
-
-    // ---------
-    const resetButton = new paper.Raster(image);
-    const resetRaster = createButton(resetButton, () => playerState.onReset());
-    resetRaster.position = new paper.Point(100, 200);
-
-    // ---------
-    const leftRotationButton = new paper.Path.Rectangle(
-        new paper.Rectangle(
-            new paper.Point(-25, -25),
-            new paper.Point(25, 25)
-        )
-    );
-    leftRotationButton.fillColor = new paper.Color(1, 1, 1, 0.1);
-    const leftRotationRaster = createButton(leftRotationButton.rasterize(), () => playerState.onRotate(90));
-    leftRotationRaster.position = new paper.Point(100, 300);
-    leftRotationButton.remove();
-
-    const rightRotationButton = new paper.Path.Rectangle(
-        new paper.Rectangle(
-            new paper.Point(-25, -25),
-            new paper.Point(25, 25)
-        )
-    );
-    rightRotationButton.fillColor = new paper.Color(1, 1, 1, 0.1);
-    const rightRotationRaster = createButton(leftRotationButton.rasterize(), () => playerState.onRotate(-90));
-    rightRotationRaster.position = new paper.Point(100, 400);
-    rightRotationButton.remove();
-    
-    
-    // 상하
-    const verticalFlipButton = new paper.Path.Rectangle(
-        new paper.Rectangle(
-            new paper.Point(-25, -25),
-            new paper.Point(25, 25)
-        )
-    );
-    verticalFlipButton.fillColor = new paper.Color(1, 1, 1, 0.1);
-    const verticalFlipRaster = createButton(leftRotationButton.rasterize(), () => playerState.onFilp(true));
-    verticalFlipRaster.position = new paper.Point(100, 500);
-    verticalFlipButton.remove();
-
-    // 좌우
-    const horizontalFlipButton = new paper.Path.Rectangle(
-        new paper.Rectangle(
-            new paper.Point(-25, -25),
-            new paper.Point(25, 25)
-        )
-    );
-    horizontalFlipButton.fillColor = new paper.Color(1, 1, 1, 0.1);
-    const horizontalFlipRaster = createButton(leftRotationButton.rasterize(), () => playerState.onFilp(false));
-    horizontalFlipRaster.position = new paper.Point(100, 600);
-    horizontalFlipButton.remove();
 }

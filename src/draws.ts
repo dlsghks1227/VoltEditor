@@ -22,7 +22,7 @@ function onFrame(event: any)
     if (!paper.view.matrix.equals(prevViewMatrix)) {
         const inverted = paper.view.matrix.invert();
         layers.backgroundLayer.matrix = inverted;
-        
+
         prevViewMatrix = paper.view.matrix.clone();
     }
 }
@@ -33,11 +33,11 @@ export function Draws()
     paper.view.onMouseDown = (event: any) => {
         playerState.onDown(event);
     }
-
+    
     paper.view.onMouseUp = (event: any) => {
         playerState.onUp(event);
     }
-
+    
     paper.view.onMouseMove = (event: any) => {
         playerState.onMove(event);
     }
@@ -52,6 +52,9 @@ export function Draws()
     paper.view.onResize = onResize;
     paper.view.onFrame = onFrame;
 
-    layers.uiLayer.activate();
     resizeLayers();
+    playerState.init();
+
+    layers.uiLayer.activate();
+    layers.guideLayer.activate();
 }

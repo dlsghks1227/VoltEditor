@@ -9,7 +9,7 @@ export function saveTileToFile() {
     const raster = clone.rasterize();
 
     const test = raster.toDataURL();
-    downloadDataURL("test.png", test);
+    downloadDataURL("Voltmap.png", test);
     clone.remove();
     raster.remove();
 }
