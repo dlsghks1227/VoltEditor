@@ -24,33 +24,54 @@ Patterns.value = {
         img: require(`../img/${twinCityPath}/006_6.png`),
     },
     'tile7': {
-        img: require(`../img/${twinCityPath}/007_start.png`),
+        img: require(`../img/${twinCityPath}/007_start_01.png`),
     },
     'tile8': {
-        img: require(`../img/${twinCityPath}/008_default.png`),
+        img: require(`../img/${twinCityPath}/008_start_02.png`),
     },
     'tile9': {
-        img: require(`../img/${twinCityPath}/009_fix.png`),
+        img: require(`../img/${twinCityPath}/009_start_03.png`),
     },
     'tile10': {
-        img: require(`../img/${twinCityPath}/010_coner.png`),
+        img: require(`../img/${twinCityPath}/010_fix.png`),
     },
     'tile11': {
-        img: require(`../img/${twinCityPath}/011_outline01.png`),
-        offset: new paper.Point(-31.5, 0),
+        img: require(`../img/${twinCityPath}/011_default_01.png`),
     },
     'tile12': {
-        img: require(`../img/${twinCityPath}/012_outline02.png`),
-        offset: new paper.Point(-31.5, 0),
+        img: require(`../img/${twinCityPath}/012_default_02.png`),
     },
     'tile13': {
-        img: require(`../img/${twinCityPath}/013_outline03.png`),
-        offset: new paper.Point(-31.5, 0),
+        img: require(`../img/${twinCityPath}/013_default_03.png`),
     },
     'tile14': {
-        img: require(`../img/${twinCityPath}/014_outline04.png`),
-        offset: new paper.Point(-31.5, -31.5),
+        img: require(`../img/${twinCityPath}/014_default_04.png`),
     },
+    'tile15': {
+        img: require(`../img/${twinCityPath}/015_hole_01.png`),
+    },
+    'tile16': {
+        img: require(`../img/${twinCityPath}/016_hole_02.png`),
+    },
+    // 'tile18': {
+    //     img: require(`../img/${twinCityPath}/018_coner.png`),
+    // },
+    // 'tile19': {
+    //     img: require(`../img/${twinCityPath}/019_outline01.png`),
+    //     offset: new paper.Point(-31.5, 0),
+    // },
+    // 'tile20': {
+    //     img: require(`../img/${twinCityPath}/020_outline02.png`),
+    //     offset: new paper.Point(-31.5, 0),
+    // },
+    // 'tile21': {
+    //     img: require(`../img/${twinCityPath}/021_outline03.png`),
+    //     offset: new paper.Point(-31.5, 0),
+    // },
+    // 'tile22': {
+    //     img: require(`../img/${twinCityPath}/022_outline04.png`),
+    //     offset: new paper.Point(-31.5, -31.5),
+    // },
 }
 
 export function load() {
@@ -60,6 +81,7 @@ export function load() {
 
         def.type = type;
         def.offset = def.offset || new paper.Point(0, 0);
+        def.isTrap = def.isTrap || false;
 
         def.icon = img;
         def.icon.onLoad = () => {

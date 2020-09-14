@@ -1,6 +1,10 @@
 import paper from 'paper';
 
-import { layers }           from '../layers';
+import { layers }   from '../layers';
+import { 
+    horizontalBlockSize,
+    verticalBlockSize 
+}from  '../constants';
 
 export function createObjectIcon(item: any) {
     layers.uiLayer.activate();
@@ -19,7 +23,7 @@ export function createObject(item: any) {
 
     const bound = new paper.Path.Rectangle(
         new paper.Point(0, 0),
-        new paper.Size(94, 94));
+        new paper.Size(horizontalBlockSize, verticalBlockSize));
     bound.strokeColor = new paper.Color('white');
     bound.strokeColor.alpha = 0;
     bound.strokeWidth = 0.1;
@@ -29,6 +33,7 @@ export function createObject(item: any) {
 
     group.addChildren([bound, pattern]);
     group.visible = false;
+    group.data.isTrap = item.isTrap;
 
     return group;
 }

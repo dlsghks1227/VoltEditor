@@ -15,6 +15,7 @@ export const layers: Record<
     | 'patternLayer'
     | 'uiLayer'
     | 'guideLayer',
+    | 'trapLayer',
     paper.Layer
 > = {};
 
@@ -28,6 +29,9 @@ export function initLayers() {
     layers.tileLayer = new paper.Layer();
     layers.tileLayer.applyMatrix = false;
 
+    layers.trapLayer = new paper.Layer();
+    layers.trapLayer.applyMatrix = false;
+
     layers.patternLayer = new paper.Layer();
     layers.patternLayer.applyMatrix = false;
 
@@ -39,6 +43,15 @@ export function initLayers() {
     );
     tileBackground.fillColor = new paper.Color(1, 1, 1, 0);
     layers.tileLayer.addChild(tileBackground);
+
+    const trapBackground = new paper.Path.Rectangle(
+        new paper.Rectangle(
+            new paper.Point(0, 0),
+            new paper.Point(horizontalBlocks * horizontalBlockSize, verticalBlocks * verticalBlockSize)
+        )
+    );
+    trapBackground.fillColor = new paper.Color(1, 1, 1, 0);
+    layers.trapLayer.addChild(trapBackground);
 
     layers.guideLayer = new paper.Layer();
     layers.guideLayer.applyMatrix = false;
@@ -87,6 +100,9 @@ export function resizeLayers() {
 
     layers.tileLayer.position = paper.view.center;
     layers.tileLayer.scaling = new paper.Point(scaleX, scaleY);
+
+    layers.trapLayer.position = paper.view.center;
+    layers.trapLayer.scaling = new paper.Point(scaleX, scaleY);
 
     layers.patternLayer.position = paper.view.center;
     layers.patternLayer.scaling = new paper.Point(scaleX, scaleY);

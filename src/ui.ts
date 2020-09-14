@@ -4,6 +4,10 @@ import { layers }           from './layers';
 import { objectMap }        from './api/asyncObject';
 import { playerState }      from './state';
 import { saveTileToFile }   from './save';
+import { 
+    horizontalBlockSize,
+    verticalBlockSize 
+}from  './constants';
 
 import { createButton }     from './ui/button';
 import { 
@@ -13,6 +17,8 @@ import {
 
 import * as TwinCity    from './pattern/TwinCity';
 import * as Rome        from './pattern/Rome';
+import * as Ruhrgebie   from './pattern/Ruhrgebie';
+import * as Tokyo       from './pattern/Tokyo';
 
 import TwinCityImg      from './img/1_TwinCity.png';
 import RomeImg          from './img/2_Rome.png';
@@ -24,13 +30,12 @@ import inven            from './img/resources/Inven.png';
 import GuideLine        from './img/resources/Guide Line.png';
 
 import ArrowButton      from './img/resources/Arrow Button_ Default.png';
-import ArrowButtonOff   from './img/resources/Arrow Button_ Touch.png';
 import ResetButton      from './img/resources/Reset.png';
 import RotationButton   from './img/resources/Rotation.png';
+import RotationBtnOff   from './img/resources/Rotation_X.png';
 import PrintButton      from './img/resources/Print.png';
 
 import * as sound       from './sound';
-import { addSyntheticLeadingComment } from 'typescript';
 
 let invenCount:     number = 0;
 let tileGuideLine:  paper.Raster;
@@ -44,13 +49,20 @@ let folderPos:      number = -357;
 let exitGroup:      paper.Group;
 let invenGroup:     paper.Group;
 
-let leftArrowRaster: paper.Group;
+let leftArrowRaster:  paper.Group;
 let rightArrowRaster: paper.Group;
+
+let rotationRaster: paper.Group;
 
 export function createPatternUI(image: any, ptn: any){
     layers.uiLayer.activate();
     const folderIcon = new paper.Raster(image);
     const folderRaster = createButton(folderIcon, () => {
+
+        sound.buttonClick.pause();
+        sound.buttonClick.currentTime = 0;
+        sound.buttonClick.play();
+
         folderGroup.visible = false;
         exitGroup.visible = true;
         selectFolder = true;
@@ -64,7 +76,7 @@ export function createPatternUI(image: any, ptn: any){
 
                 const bound = new paper.Path.Rectangle(
                     new paper.Point(0, 0),
-                    new paper.Size(94, 94));
+                    new paper.Size(horizontalBlockSize, verticalBlockSize));
                 bound.strokeColor = new paper.Color('white');
                 bound.strokeColor.alpha = 0;
                 bound.strokeWidth = 0.1;
@@ -76,6 +88,7 @@ export function createPatternUI(image: any, ptn: any){
 
                 const button = createButton(group.rasterize(), () => {
                     playerState.switchPattern(pattern);
+                    rotationRaster.data.disable(pattern.data.isTrap);
                     if (tileGuideLine) {
                         tileGuideLine.visible = true;
                         tileGuideLine.position = button.position;
@@ -203,14 +216,19 @@ function init() {
     createPatternUI(RomeImg, Rome);
 
     // Ruhrgebie
-    createPatternUI(RuhrgebieImg, Rome);
+    createPatternUI(RuhrgebieImg, Ruhrgebie);
 
     // Tokyo
-    createPatternUI(TokyoImg, Rome);
+    createPatternUI(TokyoImg, Tokyo);
 
     // Exit
     const exitIcon = new paper.Raster(ExitImg);
     const exitRaster = createButton(exitIcon, () => {
+
+        sound.buttonClick.pause();
+        sound.buttonClick.currentTime = 0;
+        sound.buttonClick.play();
+
         folderGroup.visible = true;
         exitGroup.visible = false;
 
@@ -271,10 +289,13 @@ export function DrawUI() {
 
     TwinCity.load();
     Rome.load();
+    Ruhrgebie.load();
+    Tokyo.load();
     
     // Rotation Button
     const rotationIcon = new paper.Raster(RotationButton);
-    const rotationRaster = createButton(rotationIcon, () => playerState.onRotate(-90));
+    const rotationOffIcon = new paper.Raster(RotationBtnOff);
+    rotationRaster = createButton(rotationIcon, () => playerState.onRotate(-90), rotationOffIcon);
     rotationRaster.position = new paper.Point(-550, 220);
 
     // Reset Button
