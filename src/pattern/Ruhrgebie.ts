@@ -30,31 +30,31 @@ Patterns.value = {
         img: require(`../img/${ruhrgebiePath}/008_start_02.png`),
     },
     'tile9': {
-        img: require(`../img/${ruhrgebiePath}/009_start_03.png`),
+        img: require(`../img/${ruhrgebiePath}/009_default_00.png`),
     },
     'tile10': {
-        img: require(`../img/${ruhrgebiePath}/010_default_01.png`),
+        img: require(`../img/${ruhrgebiePath}/009_start_03.png`),
     },
     'tile11': {
-        img: require(`../img/${ruhrgebiePath}/011_default_02.png`),
+        img: require(`../img/${ruhrgebiePath}/010_default_01.png`),
     },
     'tile12': {
-        img: require(`../img/${ruhrgebiePath}/012_default_03.png`),
+        img: require(`../img/${ruhrgebiePath}/011_default_02.png`),
     },
     'tile13': {
-        img: require(`../img/${ruhrgebiePath}/013_default_04.png`),
+        img: require(`../img/${ruhrgebiePath}/012_default_03.png`),
     },
     'tile14': {
-        img: require(`../img/${ruhrgebiePath}/014_default_05.png`),
+        img: require(`../img/${ruhrgebiePath}/013_default_04.png`),
     },
     'tile15': {
-        img: require(`../img/${ruhrgebiePath}/015_fix.png`),
+        img: require(`../img/${ruhrgebiePath}/014_fix.png`),
     },
     'tile16': {
-        img: require(`../img/${ruhrgebiePath}/016_electric.png`),
+        img: require(`../img/${ruhrgebiePath}/015_electric.png`),
     },
     'tile17': {
-        img: require(`../img/${ruhrgebiePath}/017_electric trap_94px.png`),
+        img: require(`../img/${ruhrgebiePath}/016_electric trap_94px.png`),
         isTrap: true,
     },
 }

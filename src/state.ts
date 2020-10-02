@@ -17,8 +17,11 @@ import * as sound from './sound';
 
 class PlayerState {
     activePattern:  any = null;
+    
     tile:           number[] = new Array<number>();
+    customTile:     number[] = new Array<number>();
     trapTile:       number[] = new Array<number>();
+    
     isButtonDown:   Boolean = false;
     isTrap:         Boolean = false;
 

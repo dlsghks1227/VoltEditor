@@ -35,6 +35,9 @@ import RotationButton   from './img/resources/Rotation.png';
 import RotationBtnOff   from './img/resources/Rotation_X.png';
 import PrintButton      from './img/resources/Print.png';
 
+import LogoImg          from './img/resources/Volt_LOGO.png';
+import CopyImg          from './img/resources/Copy.png';
+
 import * as sound       from './sound';
 
 let invenCount:     number = 0;
@@ -201,6 +204,12 @@ function init() {
     const background = new paper.Raster(inven);
     background.position = new paper.Point(0, 0);
 
+    const logo = new paper.Raster(LogoImg);
+    logo.position = new paper.Point(0, 1200);
+
+    const copy  = new paper.Raster(CopyImg);
+    copy.position = new paper.Point(0, 1300);
+
     folderGroup = new paper.Group();
     folderGroup.applyMatrix = false;
 
@@ -301,7 +310,7 @@ export function DrawUI() {
     // Reset Button
     const resetIcon = new paper.Raster(ResetButton);
     const resetRaster = createButton(resetIcon, () => playerState.onReset());
-    resetRaster.position = new paper.Point(550, 1100);
+    resetRaster.position = new paper.Point(550, 1200);
     
     // Print Button
     const printIcon = new paper.Raster(PrintButton);
@@ -313,7 +322,7 @@ export function DrawUI() {
 
         saveTileToFile();
     });
-    printRaster.position = new paper.Point(-550, 1100);
+    printRaster.position = new paper.Point(-550, 1200);
     
     init();
 }

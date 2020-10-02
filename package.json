@@ -11,6 +11,7 @@
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
     "@types/theme-ui": "^0.3.6",
+    "jspdf": "^2.1.1",
     "node-sass": "^4.14.1",
     "paper": "eugeneration/paper.js#develop",
     "paper-animate": "1.2.1",

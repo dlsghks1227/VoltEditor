@@ -10,18 +10,23 @@ import {
 
 export const layers: Record<
     | 'backgroundLayer'
+    | 'mapBackgroundLayer'
     | 'gridLayer'
     | 'tileLayer'
+    | 'trapLayer'
     | 'patternLayer'
+    | 'guideLayer'
     | 'uiLayer'
-    | 'guideLayer',
-    | 'trapLayer',
+    | 'logoLayer',
     paper.Layer
 > = {};
 
 export function initLayers() {
     layers.backgroundLayer = paper.project.activeLayer;
     layers.backgroundLayer.applyMatrix = false;
+
+    layers.mapBackgroundLayer = new paper.Layer();
+    layers.mapBackgroundLayer.applyMatrix = false;
 
     layers.gridLayer = new paper.Layer();
     layers.gridLayer.applyMatrix = false;
@@ -35,6 +40,16 @@ export function initLayers() {
     layers.patternLayer = new paper.Layer();
     layers.patternLayer.applyMatrix = false;
 
+    layers.guideLayer = new paper.Layer();
+    layers.guideLayer.applyMatrix = false;
+
+    layers.uiLayer = new paper.Layer();
+    layers.uiLayer.applyMatrix = false;
+
+    layers.logoLayer = new paper.Layer();
+    layers.logoLayer.applyMatrix = false;
+
+    // 타일 백그라운드 설정
     const tileBackground = new paper.Path.Rectangle(
         new paper.Rectangle(
             new paper.Point(0, 0),
@@ -52,38 +67,31 @@ export function initLayers() {
     );
     trapBackground.fillColor = new paper.Color(1, 1, 1, 0);
     layers.trapLayer.addChild(trapBackground);
+    // -----------------
 
-    layers.guideLayer = new paper.Layer();
-    layers.guideLayer.applyMatrix = false;
-
-    layers.uiLayer = new paper.Layer();
-    layers.uiLayer.applyMatrix = false;
-
-    layers.gridLayer.pivot = new paper.Point(
+    // ----- pivot -----
+    const Pivot = new paper.Point(
         (horizontalBlocks * horizontalBlockSize) / 2,
         (verticalBlocks * verticalBlockSize) / 2);
 
-    layers.tileLayer.pivot = new paper.Point(
-        (horizontalBlocks * horizontalBlockSize) / 2,
-        (verticalBlocks * verticalBlockSize) / 2);
+    layers.mapBackgroundLayer.pivot = Pivot;
+    layers.gridLayer.pivot          = Pivot;
+    layers.tileLayer.pivot          = Pivot;
+    layers.trapLayer.pivot          = Pivot;
+    layers.patternLayer.pivot       = Pivot;
+    layers.guideLayer.pivot         = Pivot;
+    layers.logoLayer.pivot          = Pivot;
 
-    layers.patternLayer.pivot = new paper.Point(
-        (horizontalBlocks * horizontalBlockSize) / 2,
-        (verticalBlocks * verticalBlockSize) / 2);
-
-    layers.guideLayer.pivot = new paper.Point(
-        (horizontalBlocks * horizontalBlockSize) / 2,
-        (verticalBlocks * verticalBlockSize) / 2);
-
-    layers.uiLayer.pivot = new paper.Point(0, 0);
+    layers.uiLayer.pivot            = new paper.Point(0, 0);
+    // ----- pivot -----
 }
 
 let scaleX = 1;
 let scaleY = 1;
 
 export function resizeLayers() {
-    scaleX = paper.view.size.width / ((horizontalBlocks * horizontalBlockSize) + 261);
-    scaleY = paper.view.size.height / ((verticalBlocks * verticalBlockSize) + 500);
+    scaleX = paper.view.size.width / ((horizontalBlocks * horizontalBlockSize) + 310);
+    scaleY = paper.view.size.height / ((verticalBlocks * verticalBlockSize) + 550);
 
     if (scaleX >= 1) scaleX = 1;
     if (scaleY >= 1) scaleY = 1;
@@ -95,22 +103,30 @@ export function resizeLayers() {
         scaleY = scaleX;
     }
 
-    layers.gridLayer.position = paper.view.center;
+    const layerOffset = new paper.Point(paper.view.center.x, (scaleY * 700));
+
+    layers.mapBackgroundLayer.position = layerOffset;
+    layers.mapBackgroundLayer.scaling = new paper.Point(scaleX, scaleY);
+
+    layers.gridLayer.position = layerOffset;
     layers.gridLayer.scaling = new paper.Point(scaleX, scaleY);
 
-    layers.tileLayer.position = paper.view.center;
+    layers.tileLayer.position = layerOffset;
     layers.tileLayer.scaling = new paper.Point(scaleX, scaleY);
 
-    layers.trapLayer.position = paper.view.center;
+    layers.trapLayer.position = layerOffset;
     layers.trapLayer.scaling = new paper.Point(scaleX, scaleY);
 
-    layers.patternLayer.position = paper.view.center;
+    layers.patternLayer.position = layerOffset;
     layers.patternLayer.scaling = new paper.Point(scaleX, scaleY);
 
-    layers.guideLayer.position = paper.view.center;
+    layers.guideLayer.position = layerOffset;
     layers.guideLayer.scaling = new paper.Point(scaleX, scaleY);
 
     layers.uiLayer.position = new paper.Point(paper.view.center.x, (scaleY * 80));
     layers.uiLayer.scaling = new paper.Point(scaleX, scaleY);
+
+    layers.logoLayer.position = layerOffset;
+    layers.logoLayer.scaling = new paper.Point(scaleX, scaleY);
 
 }

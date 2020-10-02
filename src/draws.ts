@@ -2,10 +2,14 @@ import paper from 'paper';
 
 import { eventEmitter } from './api/eventEmitter';
 
-import { DrawBackground } from './background';
-import { DrawGrid } from './Grid'
-import { DrawUI } from './ui';
-import { playerState } from './state';
+import { 
+    DrawBackground,
+    DrawMapBackground
+ } from './background';
+import { DrawGrid }     from './Grid'
+import { DrawUI }       from './ui';
+import { Drawlogo }     from './logo';
+import { playerState }  from './state';
 import { initLayers, layers, resizeLayers } from './layers';
 
 function onResize(event: any)
@@ -46,6 +50,10 @@ export function Draws()
     resizeLayers();
     
     DrawBackground();
+    DrawMapBackground();
+
+    Drawlogo();
+    
     DrawUI();
     DrawGrid();
 
