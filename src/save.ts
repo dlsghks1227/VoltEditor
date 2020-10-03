@@ -12,14 +12,16 @@ export function saveTileToFile() {
 
     layers.mapBackgroundLayer.scaling = new paper.Point(1, 1);
     layers.logoLayer.scaling = new paper.Point(1, 1);
+    layers.tileLayer.scaling = new paper.Point(1, 1);
     layers.trapLayer.scaling = new paper.Point(1, 1);
-    layers.trapLayer.scaling = new paper.Point(1, 1);
+    layers.customLayer.scaling = new paper.Point(1, 1);
 
     const clone = new paper.Group([
         layers.mapBackgroundLayer.clone(),
         layers.logoLayer.clone(),
         layers.tileLayer.clone(),
-        layers.trapLayer.clone()
+        layers.trapLayer.clone(),
+        layers.customLayer.clone()
     ]);
     const raster = clone.rasterize();
     

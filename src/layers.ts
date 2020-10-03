@@ -14,6 +14,7 @@ export const layers: Record<
     | 'gridLayer'
     | 'tileLayer'
     | 'trapLayer'
+    | 'customLayer'
     | 'patternLayer'
     | 'guideLayer'
     | 'uiLayer'
@@ -36,6 +37,9 @@ export function initLayers() {
 
     layers.trapLayer = new paper.Layer();
     layers.trapLayer.applyMatrix = false;
+
+    layers.customLayer = new paper.Layer();
+    layers.customLayer.applyMatrix = false;
 
     layers.patternLayer = new paper.Layer();
     layers.patternLayer.applyMatrix = false;
@@ -67,6 +71,15 @@ export function initLayers() {
     );
     trapBackground.fillColor = new paper.Color(1, 1, 1, 0);
     layers.trapLayer.addChild(trapBackground);
+
+    const customBackground = new paper.Path.Rectangle(
+        new paper.Rectangle(
+            new paper.Point(0, 0),
+            new paper.Point(horizontalBlocks * horizontalBlockSize, verticalBlocks * verticalBlockSize)
+        )
+    );
+    customBackground.fillColor = new paper.Color(1, 1, 1, 0);
+    layers.customLayer.addChild(customBackground);
     // -----------------
 
     // ----- pivot -----
@@ -78,6 +91,7 @@ export function initLayers() {
     layers.gridLayer.pivot          = Pivot;
     layers.tileLayer.pivot          = Pivot;
     layers.trapLayer.pivot          = Pivot;
+    layers.customLayer.pivot        = Pivot;
     layers.patternLayer.pivot       = Pivot;
     layers.guideLayer.pivot         = Pivot;
     layers.logoLayer.pivot          = Pivot;
@@ -108,25 +122,28 @@ export function resizeLayers() {
     layers.mapBackgroundLayer.position = layerOffset;
     layers.mapBackgroundLayer.scaling = new paper.Point(scaleX, scaleY);
 
-    layers.gridLayer.position = layerOffset;
-    layers.gridLayer.scaling = new paper.Point(scaleX, scaleY);
+    layers.gridLayer.position   = layerOffset;
+    layers.gridLayer.scaling    = new paper.Point(scaleX, scaleY);
 
-    layers.tileLayer.position = layerOffset;
-    layers.tileLayer.scaling = new paper.Point(scaleX, scaleY);
+    layers.tileLayer.position   = layerOffset;
+    layers.tileLayer.scaling    = new paper.Point(scaleX, scaleY);
 
-    layers.trapLayer.position = layerOffset;
-    layers.trapLayer.scaling = new paper.Point(scaleX, scaleY);
+    layers.trapLayer.position   = layerOffset;
+    layers.trapLayer.scaling    = new paper.Point(scaleX, scaleY);
+
+    layers.customLayer.position = layerOffset;
+    layers.customLayer.scaling  = new paper.Point(scaleX, scaleY);
 
     layers.patternLayer.position = layerOffset;
     layers.patternLayer.scaling = new paper.Point(scaleX, scaleY);
 
-    layers.guideLayer.position = layerOffset;
-    layers.guideLayer.scaling = new paper.Point(scaleX, scaleY);
+    layers.guideLayer.position  = layerOffset;
+    layers.guideLayer.scaling   = new paper.Point(scaleX, scaleY);
 
-    layers.uiLayer.position = new paper.Point(paper.view.center.x, (scaleY * 80));
-    layers.uiLayer.scaling = new paper.Point(scaleX, scaleY);
+    layers.uiLayer.position     = new paper.Point(paper.view.center.x, (scaleY * 80));
+    layers.uiLayer.scaling      = new paper.Point(scaleX, scaleY);
 
-    layers.logoLayer.position = layerOffset;
-    layers.logoLayer.scaling = new paper.Point(scaleX, scaleY);
+    layers.logoLayer.position   = layerOffset;
+    layers.logoLayer.scaling    = new paper.Point(scaleX, scaleY);
 
 }

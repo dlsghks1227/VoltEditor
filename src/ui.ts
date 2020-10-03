@@ -19,12 +19,14 @@ import * as TwinCity    from './pattern/TwinCity';
 import * as Rome        from './pattern/Rome';
 import * as Ruhrgebie   from './pattern/Ruhrgebie';
 import * as Tokyo       from './pattern/Tokyo';
+import * as Custom      from './pattern/Custom';
 
 import TwinCityImg      from './img/1_TwinCity.png';
 import RomeImg          from './img/2_Rome.png';
 import RuhrgebieImg     from './img/3_Ruhrgebie.png';
 import TokyoImg         from './img/4_Tokyo.png';
 import ExitImg          from './img/5_Exit.png';
+import CustomImg        from './img/6_CustomTile.png';
 
 import inven            from './img/resources/Inven.png';
 import GuideLine        from './img/resources/Guide Line.png';
@@ -113,7 +115,7 @@ export function createPatternUI(image: any, ptn: any){
     });
     
     folderRaster.position = new paper.Point(folderPos, -10);
-    folderPos += 238;
+    folderPos += (714 / 4);
     folderGroup.addChild(folderRaster);
 }
 
@@ -230,6 +232,9 @@ function init() {
     // Tokyo
     createPatternUI(TokyoImg, Tokyo);
 
+    // Custom
+    createPatternUI(CustomImg, Custom);
+
     // Exit
     const exitIcon = new paper.Raster(ExitImg);
     const exitRaster = createButton(exitIcon, () => {
@@ -300,6 +305,7 @@ export function DrawUI() {
     Rome.load();
     Ruhrgebie.load();
     Tokyo.load();
+    Custom.load();
     
     // Rotation Button
     const rotationIcon = new paper.Raster(RotationButton);

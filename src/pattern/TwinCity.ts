@@ -1,5 +1,6 @@
 import paper from 'paper';
 import { AsyncObject } from '../api/asyncObject';
+import { TileState } from '../state';
 
 const twinCityPath = "TileStyle1"
 
@@ -53,25 +54,6 @@ Patterns.value = {
     'tile16': {
         img: require(`../img/${twinCityPath}/016_hole_02.png`),
     },
-    // 'tile18': {
-    //     img: require(`../img/${twinCityPath}/018_coner.png`),
-    // },
-    // 'tile19': {
-    //     img: require(`../img/${twinCityPath}/019_outline01.png`),
-    //     offset: new paper.Point(-31.5, 0),
-    // },
-    // 'tile20': {
-    //     img: require(`../img/${twinCityPath}/020_outline02.png`),
-    //     offset: new paper.Point(-31.5, 0),
-    // },
-    // 'tile21': {
-    //     img: require(`../img/${twinCityPath}/021_outline03.png`),
-    //     offset: new paper.Point(-31.5, 0),
-    // },
-    // 'tile22': {
-    //     img: require(`../img/${twinCityPath}/022_outline04.png`),
-    //     offset: new paper.Point(-31.5, -31.5),
-    // },
 }
 
 export function load() {
@@ -81,7 +63,7 @@ export function load() {
 
         def.type = type;
         def.offset = def.offset || new paper.Point(0, 0);
-        def.isTrap = def.isTrap || false;
+        def.tileState = def.state || TileState.Default;
 
         def.icon = img;
         def.icon.onLoad = () => {

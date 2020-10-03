@@ -1,5 +1,6 @@
 import paper from 'paper';
 import { AsyncObject } from '../api/asyncObject';
+import { TileState } from '../state';
 
 const tokyoPath = "TileStyle4"
 
@@ -49,15 +50,15 @@ Patterns.value = {
     },
     'tile15': {
         img: require(`../img/${tokyoPath}/015_wall_01.png`),
-        isTrap: true,
+        state: TileState.Trap,
     },
     'tile16': {
         img: require(`../img/${tokyoPath}/016_wall_02.png`),
-        isTrap: true,
+        state: TileState.Trap,
     },
     'tile17': {
         img: require(`../img/${tokyoPath}/017_wall_03.png`),
-        isTrap: true,
+        state: TileState.Trap,
     },
 }
 
@@ -68,7 +69,7 @@ export function load() {
 
         def.type = type;
         def.offset = def.offset || new paper.Point(0, 0);
-        def.isTrap = def.isTrap || false;
+        def.tileState = def.state || TileState.Default;
 
         def.icon = img;
         def.icon.onLoad = () => {

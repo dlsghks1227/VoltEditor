@@ -15,7 +15,7 @@ export function Drawlogo() {
     const copy = new paper.Raster(CopyImg);
     copy.position= new paper.Point(
         (horizontalBlocks * horizontalBlockSize) / 2,
-        (verticalBlocks * verticalBlockSize) - copy.size.height);
+        (verticalBlocks * verticalBlockSize) - 14);
         
     layers.logoLayer.visible = false;
 }

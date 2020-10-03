@@ -33,7 +33,7 @@ export function createObject(item: any) {
 
     group.addChildren([bound, pattern]);
     group.visible = false;
-    group.data.isTrap = item.isTrap;
+    group.data.tileState = item.tileState;
 
     return group;
 }

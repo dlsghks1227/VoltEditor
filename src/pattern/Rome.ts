@@ -1,5 +1,6 @@
 import paper from 'paper';
 import { AsyncObject } from '../api/asyncObject';
+import { TileState } from '../state';
 
 const RomePath = "TileStyle2"
 
@@ -65,8 +66,8 @@ export function load() {
 
         def.type = type;
         def.offset = def.offset || new paper.Point(0, 0);
-        def.isTrap = def.isTrap || false;
-        
+        def.tileState = def.state || TileState.Default;
+
         def.icon = img;
         def.icon.onLoad = () => {
             Patterns.onLoad();
