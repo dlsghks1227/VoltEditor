@@ -33,6 +33,8 @@ import GuideLine        from './img/resources/Guide Line.png';
 
 import ArrowButton      from './img/resources/Arrow Button_ Default.png';
 import ResetButton      from './img/resources/Reset.png';
+import EraserButton     from './img/resources/Eraser.png';
+import PaintButton      from './img/resources/Paint.png';
 import RotationButton   from './img/resources/Rotation.png';
 import RotationBtnOff   from './img/resources/Rotation_X.png';
 import PrintButton      from './img/resources/Print.png';
@@ -255,6 +257,8 @@ function init() {
         leftArrowRaster.data.disable(true);
         rightArrowRaster.data.disable(true);
 
+        playerState.switchPattern(null);
+
         selectFolder = false;
     });
     exitRaster.position = new paper.Point(0, 90);
@@ -311,12 +315,22 @@ export function DrawUI() {
     const rotationIcon = new paper.Raster(RotationButton);
     const rotationOffIcon = new paper.Raster(RotationBtnOff);
     rotationRaster = createButton(rotationIcon, () => playerState.onRotate(-90), rotationOffIcon);
-    rotationRaster.position = new paper.Point(-550, 220);
+    rotationRaster.position = new paper.Point(-540, 220);
+
+    // Eraser Button
+    const eraserIcon = new paper.Raster(EraserButton);
+    const eraserRaster = createButton(eraserIcon, () => playerState.onEraser());
+    eraserRaster.position = new paper.Point(-540, 330);
+
+    // Paint Button
+    const paintIcon = new paper.Raster(PaintButton);
+    const paintRaster = createButton(paintIcon, () => {});
+    paintRaster.position = new paper.Point(540, 220);
 
     // Reset Button
     const resetIcon = new paper.Raster(ResetButton);
     const resetRaster = createButton(resetIcon, () => playerState.onReset());
-    resetRaster.position = new paper.Point(550, 1200);
+    resetRaster.position = new paper.Point(540, 330);
     
     // Print Button
     const printIcon = new paper.Raster(PrintButton);
@@ -328,7 +342,7 @@ export function DrawUI() {
 
         saveTileToFile();
     });
-    printRaster.position = new paper.Point(-550, 1200);
+    printRaster.position = new paper.Point(-540, 1200);
     
     init();
 }
