@@ -21,6 +21,14 @@ export enum TileState {
     Custom,
 }
 
+export enum ActiveState {
+    Default = 0,
+    Tile,
+    Paint,
+    Rotate,
+    Eraser,
+}
+
 class PlayerState {
     activePattern:  any = null;
     
@@ -30,19 +38,23 @@ class PlayerState {
     
     isButtonDown:   Boolean     = false;
     tileState:      TileState   = TileState.Default;
+    activeState:    ActiveState = ActiveState.Default;
 
-    gridGuideLine: paper.Raster;
+    isRotateTileClicked:        boolean = false;
+    clickedRotateTilePosition:  paper.Point;
+
+    gridGuideLine:  paper.Raster;
     gridGuideLine2: paper.Raster;
 
     init() {
-        this.gridGuideLine = new paper.Raster(GuideLine);
-        this.gridGuideLine.position = new paper.Point(horizontalBlockSize / 2, verticalBlockSize / 2);
-        this.gridGuideLine.scaling = new paper.Size(horizontalBlockSize / 94, verticalBlockSize / 94);
-        this.gridGuideLine.visible = true;
+        this.gridGuideLine              = new paper.Raster(GuideLine);
+        this.gridGuideLine.position     = new paper.Point(horizontalBlockSize / 2, verticalBlockSize / 2);
+        this.gridGuideLine.scaling      = new paper.Size(horizontalBlockSize / 94, verticalBlockSize / 94);
+        this.gridGuideLine.visible      = true;
 
-        this.gridGuideLine2 = new paper.Raster(GuideLine2);
-        this.gridGuideLine2.position = new paper.Point(horizontalBlockSize / 2, verticalBlockSize / 2);
-        this.gridGuideLine2.visible = false;
+        this.gridGuideLine2             = new paper.Raster(GuideLine2);
+        this.gridGuideLine2.position    = new paper.Point(horizontalBlockSize / 2, verticalBlockSize / 2);
+        this.gridGuideLine2.visible     = false;
 
         layers.guideLayer.addChild(this.gridGuideLine);
         layers.guideLayer.addChild(this.gridGuideLine2);
@@ -53,11 +65,15 @@ class PlayerState {
         this.trapTile   = new Array<number>();
     }
 
+    switchActiveState(state: ActiveState) {
+        this.activeState = state;
+    }
+
     switchPattern(pattern: any) {
 
-        sound.buttonClick.pause();
-        sound.buttonClick.currentTime = 0;
-        sound.buttonClick.play();
+        // sound.buttonClick.pause();
+        // sound.buttonClick.currentTime = 0;
+        // sound.buttonClick.play();
 
         layers.tileLayer.activate();
 
@@ -82,7 +98,6 @@ class PlayerState {
         }
 
         this.tileState = pattern.data.tileState;
-
         this.activePattern = pattern;
 
         this.activePattern.applyMatrix = false;
@@ -90,6 +105,25 @@ class PlayerState {
 
         this.activePattern.rotation = 0;
         this.activePattern.opacity = 0.7;
+        
+        if (this.activeState === ActiveState.Paint && this.activePattern.data.tileState === TileState.Default) {
+            for (let x = 0; x < horizontalBlocks; x++) {
+                for (let y = 0; y < verticalBlocks; y++) {
+                    if (this.tile[x + (y * horizontalBlocks)] === undefined) {
+                        const allPosition = new paper.Point(x, y);
+                        this.placePattern(pattern.clone(), allPosition, this.activePattern.data.tileState);
+                    }
+                }
+            }
+
+            this.activePattern = null;
+
+            this.gridGuideLine.visible = true;
+            this.gridGuideLine2.visible = false;
+
+            this.switchActiveState(ActiveState.Default);
+            return;
+        }
 
         switch (this.tileState) {
             case TileState.Default:
@@ -109,7 +143,12 @@ class PlayerState {
                 {
                     layers.trapLayer.activate();
 
-                    this.activePattern.position = new paper.Point(horizontalBlockSize, verticalBlockSize);
+                    this.activePattern.position = new paper.Point(horizontalBlockSize, verticalBlockSize / 2);
+                    this.gridGuideLine2.position = new paper.Point(horizontalBlockSize, verticalBlockSize / 2);
+
+
+                    this.activePattern.rotation = 0;
+                    this.gridGuideLine2.rotation = 0;
 
                     this.gridGuideLine.visible = false;
                     this.gridGuideLine2.visible = true;
@@ -128,6 +167,7 @@ class PlayerState {
                     break;
                 }
         }
+        this.switchActiveState(ActiveState.Tile);
 
         this.isButtonDown = true;
     }
@@ -190,17 +230,17 @@ class PlayerState {
 
     onUp(event: any) {
         if (this.activePattern && !this.isButtonDown) {
-
-            sound.placeTile.pause();
-            sound.placeTile.currentTime = 0;
-            sound.placeTile.play();
-
             switch (this.tileState) {
                 case TileState.Default:
                     // 일반 타일
                     {
                         const pos = getWorldPositionToGrid(layers.gridLayer.globalToLocal(event.point));
                         if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
+
+                            sound.placeTile.pause();
+                            sound.placeTile.currentTime = 0;
+                            sound.placeTile.play();
+
                             // for (let x = 0; x < horizontalBlocks; x++) {
                             //     for (let y = 0; y < verticalBlocks; y++) {
                             //         if (this.tile[x + (y * horizontalBlocks)] === undefined)
@@ -225,6 +265,11 @@ class PlayerState {
                     {
                         const pos = getWorldPositionToLine(layers.gridLayer.globalToLocal(event.point));
                         if ((pos.x >= 0 && pos.x < horizontalBlocks * 2) && (pos.y >= 0 && pos.y < verticalBlocks * 2)) {
+              
+                            sound.placeTile.pause();
+                            sound.placeTile.currentTime = 0;
+                            sound.placeTile.play();
+
                             const mousePos = layers.gridLayer.globalToLocal(event.point).divide(new paper.Point(horizontalBlockSize / 2, verticalBlockSize / 2));
                             const tilePos = isometric(pos, mousePos);
                             if (!this.trapTile[tilePos.x + (tilePos.y * horizontalBlocks)]) {
@@ -242,6 +287,11 @@ class PlayerState {
                         const pos = getWorldPositionToGrid(layers.gridLayer.globalToLocal(event.point));
                         if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
                             if (this.tile[pos.x + (pos.y * horizontalBlocks)]) {
+
+                                sound.placeTile.pause();
+                                sound.placeTile.currentTime = 0;
+                                sound.placeTile.play();
+
                                 if (!this.customTile[pos.x + (pos.y * horizontalBlocks)]) {
                                     this.placePattern(this.activePattern.clone(), pos, this.tileState);
                                 } else {
@@ -257,6 +307,39 @@ class PlayerState {
         else if (this.activePattern === null)
         {
 
+            const pos = getWorldPositionToGrid(layers.gridLayer.globalToLocal(event.point));
+            if (this.activeState === ActiveState.Paint) {
+                if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
+                    const currentTile = this.tile[pos.x + (pos.y * horizontalBlocks)];
+                    if (currentTile)
+                    {
+                        for (let x = 0; x < horizontalBlocks; x++) {
+                            for (let y = 0; y < verticalBlocks; y++) {
+                                if (this.tile[x + (y * horizontalBlocks)] === undefined) {
+                                    const allPosition = new paper.Point(x, y);
+                                    this.placePattern(currentTile.clone(), allPosition, currentTile.data.tileState);
+                                }
+                            }
+                        }
+
+                        this.onDefault();
+                    }
+                }
+            } else if (this.activeState === ActiveState.Eraser) {
+                if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
+                    if (this.tile[pos.x + (pos.y * horizontalBlocks)]) {
+                        this.tile[pos.x + (pos.y * horizontalBlocks)].remove();
+                        this.tile[pos.x + (pos.y * horizontalBlocks)] = undefined;
+                    }
+                    if (this.customTile[pos.x + (pos.y * horizontalBlocks)]) {
+                        this.customTile[pos.x + (pos.y * horizontalBlocks)].remove();
+                        this.customTile[pos.x + (pos.y * horizontalBlocks)] = undefined;
+                    }
+                }
+            } else if (this.activeState === ActiveState.Rotate) {
+                if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
+                }
+            }
         }
 
         this.isButtonDown = false;
@@ -326,8 +409,7 @@ class PlayerState {
                     }
             }
         }
-        else if (this.activePattern === null)
-        {
+        else if (this.activePattern === null) {
             const pos = getWorldPositionToGrid(layers.gridLayer.globalToLocal(event.point));
             if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
                 const tilePos = pos
@@ -348,6 +430,15 @@ class PlayerState {
             layers.tileLayer.activate();
             this.activePattern.rotate(angle);
         }
+        else {
+            if (this.activeState === ActiveState.Rotate) {
+                this.onDefault();
+                return;
+            }
+
+            this.switchPattern(null);
+            this.switchActiveState(ActiveState.Rotate);
+        }
     }
 
     onFilp(isVertical: Boolean) {
@@ -362,8 +453,32 @@ class PlayerState {
         }
     }
 
-    onEraser() {
+    onDefault() {
         this.switchPattern(null);
+        this.switchActiveState(ActiveState.Default);
+    }
+
+    onEraser() {
+        if (this.activeState === ActiveState.Eraser) {
+            this.onDefault();
+            return;
+        }
+        this.switchPattern(null);
+        this.switchActiveState(ActiveState.Eraser);
+    }
+
+    onPaint() {
+        if (this.activeState === ActiveState.Paint) {
+            this.onDefault();
+            return;
+        }
+        this.switchPattern(null);
+        this.switchActiveState(ActiveState.Paint);
+    }
+
+    onToggleRotate() {
+        this.switchPattern(null);
+        this.switchActiveState(ActiveState.Rotate);
     }
 
     onReset() {

@@ -2,7 +2,7 @@ import paper from 'paper';
 
 import { layers }           from './layers';
 import { objectMap }        from './api/asyncObject';
-import { playerState }      from './state';
+import { playerState, TileState }      from './state';
 import { saveTileToFile }   from './save';
 import { 
     horizontalBlockSize,
@@ -95,7 +95,12 @@ export function createPatternUI(image: any, ptn: any){
 
                 const button = createButton(group.rasterize(), () => {
                     playerState.switchPattern(pattern);
-                    rotationRaster.data.disable(pattern.data.isTrap);
+
+                    sound.buttonClick.pause();
+                    sound.buttonClick.currentTime = 0;
+                    sound.buttonClick.play();
+
+                    rotationRaster.data.disable((pattern.data.tileState === TileState.Trap));
                     if (tileGuideLine) {
                         tileGuideLine.visible = true;
                         tileGuideLine.position = button.position;
@@ -257,7 +262,7 @@ function init() {
         leftArrowRaster.data.disable(true);
         rightArrowRaster.data.disable(true);
 
-        playerState.switchPattern(null);
+        playerState.onDefault();
 
         selectFolder = false;
     });
@@ -324,7 +329,7 @@ export function DrawUI() {
 
     // Paint Button
     const paintIcon = new paper.Raster(PaintButton);
-    const paintRaster = createButton(paintIcon, () => {});
+    const paintRaster = createButton(paintIcon, () => playerState.onPaint());
     paintRaster.position = new paper.Point(540, 220);
 
     // Reset Button
