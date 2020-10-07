@@ -14,12 +14,12 @@ export function downloadDataURL(filename: any, data: any)
     document.body.removeChild(element);
 }
 
-const MAPWIDTH = 180;
-const MAPHEIGHT = 180;
+const MAPWIDTH = 890;
+const MAPHEIGHT = 890;
 
 export function downloadPDF(filename: any, data: any)
 {
-    const doc = new jsPDF('p', 'mm', 'a4');
-    doc.addImage(data, (210 / 2) - (MAPWIDTH / 2), (297 / 2) - (MAPHEIGHT / 2), MAPWIDTH, MAPHEIGHT);
+    const doc = new jsPDF('p', 'px', [MAPWIDTH, MAPHEIGHT]);
+    doc.addImage(data, 'PNG', 0, 0, MAPWIDTH, MAPWIDTH);
     doc.save(filename)
 }

@@ -40,9 +40,6 @@ class PlayerState {
     tileState:      TileState   = TileState.Default;
     activeState:    ActiveState = ActiveState.Default;
 
-    isRotateTileClicked:        boolean = false;
-    clickedRotateTilePosition:  paper.Point;
-
     gridGuideLine:  paper.Raster;
     gridGuideLine2: paper.Raster;
 
@@ -100,13 +97,18 @@ class PlayerState {
         this.tileState = pattern.data.tileState;
         this.activePattern = pattern;
 
-        this.activePattern.applyMatrix = false;
-        this.activePattern.visible = true;
+        this.activePattern.applyMatrix  = false;
+        this.activePattern.visible      = true;
 
-        this.activePattern.rotation = 0;
-        this.activePattern.opacity = 0.7;
+        this.activePattern.rotation     = 0;
+        this.activePattern.opacity      = 0.7;
         
         if (this.activeState === ActiveState.Paint && this.activePattern.data.tileState === TileState.Default) {
+
+            sound.paintButton.pause();
+            sound.paintButton.currentTime = 0;
+            sound.paintButton.play();
+
             for (let x = 0; x < horizontalBlocks; x++) {
                 for (let y = 0; y < verticalBlocks; y++) {
                     if (this.tile[x + (y * horizontalBlocks)] === undefined) {
@@ -115,6 +117,9 @@ class PlayerState {
                     }
                 }
             }
+
+            this.activePattern.applyMatrix  = false;
+            this.activePattern.visible      = false;
 
             this.activePattern = null;
 
@@ -237,9 +242,11 @@ class PlayerState {
                         const pos = getWorldPositionToGrid(layers.gridLayer.globalToLocal(event.point));
                         if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
 
-                            sound.placeTile.pause();
-                            sound.placeTile.currentTime = 0;
-                            sound.placeTile.play();
+                            if (this.activeState === ActiveState.Tile) {
+                                sound.placeTile.pause();
+                                sound.placeTile.currentTime = 0;
+                                sound.placeTile.play();
+                            }
 
                             // for (let x = 0; x < horizontalBlocks; x++) {
                             //     for (let y = 0; y < verticalBlocks; y++) {
@@ -266,9 +273,11 @@ class PlayerState {
                         const pos = getWorldPositionToLine(layers.gridLayer.globalToLocal(event.point));
                         if ((pos.x >= 0 && pos.x < horizontalBlocks * 2) && (pos.y >= 0 && pos.y < verticalBlocks * 2)) {
               
-                            sound.placeTile.pause();
-                            sound.placeTile.currentTime = 0;
-                            sound.placeTile.play();
+                            if (this.activeState === ActiveState.Tile) {
+                                sound.placeTile.pause();
+                                sound.placeTile.currentTime = 0;
+                                sound.placeTile.play();
+                            }
 
                             const mousePos = layers.gridLayer.globalToLocal(event.point).divide(new paper.Point(horizontalBlockSize / 2, verticalBlockSize / 2));
                             const tilePos = isometric(pos, mousePos);
@@ -288,9 +297,11 @@ class PlayerState {
                         if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
                             if (this.tile[pos.x + (pos.y * horizontalBlocks)]) {
 
-                                sound.placeTile.pause();
-                                sound.placeTile.currentTime = 0;
-                                sound.placeTile.play();
+                                if (this.activeState === ActiveState.Tile) {
+                                    sound.placeTile.pause();
+                                    sound.placeTile.currentTime = 0;
+                                    sound.placeTile.play();
+                                }
 
                                 if (!this.customTile[pos.x + (pos.y * horizontalBlocks)]) {
                                     this.placePattern(this.activePattern.clone(), pos, this.tileState);
@@ -306,13 +317,16 @@ class PlayerState {
         }
         else if (this.activePattern === null)
         {
-
             const pos = getWorldPositionToGrid(layers.gridLayer.globalToLocal(event.point));
             if (this.activeState === ActiveState.Paint) {
                 if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
                     const currentTile = this.tile[pos.x + (pos.y * horizontalBlocks)];
                     if (currentTile)
                     {
+                        sound.paintButton.pause();
+                        sound.paintButton.currentTime = 0;
+                        sound.paintButton.play();
+
                         for (let x = 0; x < horizontalBlocks; x++) {
                             for (let y = 0; y < verticalBlocks; y++) {
                                 if (this.tile[x + (y * horizontalBlocks)] === undefined) {
@@ -327,6 +341,11 @@ class PlayerState {
                 }
             } else if (this.activeState === ActiveState.Eraser) {
                 if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
+
+                    sound.eraserButton.pause();
+                    sound.eraserButton.currentTime = 0;
+                    sound.eraserButton.play();
+
                     if (this.tile[pos.x + (pos.y * horizontalBlocks)]) {
                         this.tile[pos.x + (pos.y * horizontalBlocks)].remove();
                         this.tile[pos.x + (pos.y * horizontalBlocks)] = undefined;
@@ -338,6 +357,15 @@ class PlayerState {
                 }
             } else if (this.activeState === ActiveState.Rotate) {
                 if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
+                    if (this.tile[pos.x + (pos.y * horizontalBlocks)]) {
+
+                        sound.buttonClick.pause();
+                        sound.buttonClick.currentTime = 0;
+                        sound.buttonClick.play();
+
+                        layers.tileLayer.activate();
+                        this.tile[pos.x + (pos.y * horizontalBlocks)].rotate(-90.0);
+                    }
                 }
             }
         }
@@ -420,7 +448,7 @@ class PlayerState {
         }
     }
 
-    onRotate(angle: number) {
+    onRotate(angle: number, btnRaster?: paper.Group) {
 
         sound.buttonClick.pause();
         sound.buttonClick.currentTime = 0;
@@ -433,11 +461,14 @@ class PlayerState {
         else {
             if (this.activeState === ActiveState.Rotate) {
                 this.onDefault();
+                btnRaster?.data.select(false);
                 return;
             }
 
             this.switchPattern(null);
             this.switchActiveState(ActiveState.Rotate);
+            btnRaster?.data.select(true);
+            
         }
     }
 
@@ -459,6 +490,11 @@ class PlayerState {
     }
 
     onEraser() {
+
+        sound.buttonClick.pause();
+        sound.buttonClick.currentTime = 0;
+        sound.buttonClick.play();
+
         if (this.activeState === ActiveState.Eraser) {
             this.onDefault();
             return;
@@ -468,17 +504,17 @@ class PlayerState {
     }
 
     onPaint() {
+
+        sound.buttonClick.pause();
+        sound.buttonClick.currentTime = 0;
+        sound.buttonClick.play();
+
         if (this.activeState === ActiveState.Paint) {
             this.onDefault();
             return;
         }
         this.switchPattern(null);
         this.switchActiveState(ActiveState.Paint);
-    }
-
-    onToggleRotate() {
-        this.switchPattern(null);
-        this.switchActiveState(ActiveState.Rotate);
     }
 
     onReset() {

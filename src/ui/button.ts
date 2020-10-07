@@ -1,6 +1,6 @@
 import paper from 'paper';
 
-export function createButton(item: any, onClick: any, disable?: any) {
+export function createButton(item: any, onClick: any, disable?: any, selected?: any) {
     const group = new paper.Group();
 
     const button = new paper.Path.Rectangle(
@@ -11,18 +11,23 @@ export function createButton(item: any, onClick: any, disable?: any) {
 
     group.applyMatrix = false;
 
-    if (disable)
-        disable.visible = false;
+    if (disable)    disable.visible = false;
+    if (selected)   selected.visible  = false;
 
-    group.addChildren([button, item, disable]);
+    group.addChildren([button, item, disable, selected]);
 
     group.data = {
-        selected: false,
-        hovered: false,
-        pressed: false,
-        disabled: false,
+        selected:   false,
+        hovered:    false,
+        pressed:    false,
+        disabled:   false,
         select(isSelected: Boolean) {
             group.data.selected = isSelected;
+            if (selected)
+            {
+                item.visible = !isSelected;
+                selected.visible = isSelected;
+            }
         },
         hover(isHover: Boolean) {
             group.data.hovered = isHover;

@@ -37,6 +37,7 @@ import EraserButton     from './img/resources/Eraser.png';
 import PaintButton      from './img/resources/Paint.png';
 import RotationButton   from './img/resources/Rotation.png';
 import RotationBtnOff   from './img/resources/Rotation_X.png';
+import RotationBtnSel   from './img/resources/Rotation_selected.png';
 import PrintButton      from './img/resources/Print.png';
 
 import LogoImg          from './img/resources/Volt_LOGO.png';
@@ -100,7 +101,9 @@ export function createPatternUI(image: any, ptn: any){
                     sound.buttonClick.currentTime = 0;
                     sound.buttonClick.play();
 
+                    rotationRaster.data.select(false);
                     rotationRaster.data.disable((pattern.data.tileState === TileState.Trap));
+
                     if (tileGuideLine) {
                         tileGuideLine.visible = true;
                         tileGuideLine.position = button.position;
@@ -147,7 +150,13 @@ function changeInven(tiles: any)
     activePattern = tiles;
 
     leftArrowRaster.data.disable(true);
-    rightArrowRaster.data.disable(false);
+    if (Object.keys(activePattern).length <= 7) {
+        rightArrowRaster.data.disable(true);
+    }
+    else
+    {
+        rightArrowRaster.data.disable(false);
+    }
     
     let pos = -357;
     //group.applyMatrix = false;
@@ -262,6 +271,9 @@ function init() {
         leftArrowRaster.data.disable(true);
         rightArrowRaster.data.disable(true);
 
+        rotationRaster.data.select(false);
+        rotationRaster.data.disable(false);
+
         playerState.onDefault();
 
         selectFolder = false;
@@ -319,22 +331,34 @@ export function DrawUI() {
     // Rotation Button
     const rotationIcon = new paper.Raster(RotationButton);
     const rotationOffIcon = new paper.Raster(RotationBtnOff);
-    rotationRaster = createButton(rotationIcon, () => playerState.onRotate(-90), rotationOffIcon);
+    const RotationSelIcon = new paper.Raster(RotationBtnSel);
+    rotationRaster = createButton(rotationIcon, () => {
+        playerState.onRotate(-90, rotationRaster);
+    }, rotationOffIcon, RotationSelIcon);
     rotationRaster.position = new paper.Point(-540, 220);
 
     // Eraser Button
     const eraserIcon = new paper.Raster(EraserButton);
-    const eraserRaster = createButton(eraserIcon, () => playerState.onEraser());
+    const eraserRaster = createButton(eraserIcon, () => {
+        playerState.onEraser();
+        rotationRaster.data.select(false);
+    });
     eraserRaster.position = new paper.Point(-540, 330);
 
     // Paint Button
     const paintIcon = new paper.Raster(PaintButton);
-    const paintRaster = createButton(paintIcon, () => playerState.onPaint());
+    const paintRaster = createButton(paintIcon, () => {
+        playerState.onPaint();
+        rotationRaster.data.select(false);
+    });
     paintRaster.position = new paper.Point(540, 220);
 
     // Reset Button
     const resetIcon = new paper.Raster(ResetButton);
-    const resetRaster = createButton(resetIcon, () => playerState.onReset());
+    const resetRaster = createButton(resetIcon, () => {
+        playerState.onReset();
+        rotationRaster.data.select(false);
+    });
     resetRaster.position = new paper.Point(540, 330);
     
     // Print Button
@@ -346,6 +370,7 @@ export function DrawUI() {
         sound.printButton.play();
 
         saveTileToFile();
+        rotationRaster.data.select(false);
     });
     printRaster.position = new paper.Point(-540, 1200);
     
