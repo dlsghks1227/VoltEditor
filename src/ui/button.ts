@@ -1,6 +1,6 @@
 import paper from 'paper';
 
-export function createButton(item: any, onClick: any, disable?: any, selected?: any) {
+export function createButton(item: any, onClick: any, selected?: any, disable?: any) {
     const group = new paper.Group();
 
     const button = new paper.Path.Rectangle(

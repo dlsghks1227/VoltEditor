@@ -295,8 +295,7 @@ class PlayerState {
                     {
                         const pos = getWorldPositionToGrid(layers.gridLayer.globalToLocal(event.point));
                         if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
-                            if (this.tile[pos.x + (pos.y * horizontalBlocks)]) {
-
+                            //if (this.tile[pos.x + (pos.y * horizontalBlocks)])
                                 if (this.activeState === ActiveState.Tile) {
                                     sound.placeTile.pause();
                                     sound.placeTile.currentTime = 0;
@@ -309,7 +308,6 @@ class PlayerState {
                                     this.customTile[pos.x + (pos.y * horizontalBlocks)].remove();
                                     this.placePattern(this.activePattern.clone(), pos, this.tileState);
                                 }
-                            }
                         }
                         break;
                     }
@@ -420,8 +418,7 @@ class PlayerState {
                     {
                         const pos = getWorldPositionToGrid(layers.gridLayer.globalToLocal(event.point));
                         if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
-                            if (this.tile[pos.x + (pos.y * horizontalBlocks)])
-                            {
+                            //if (this.tile[pos.x + (pos.y * horizontalBlocks)])
                                 tilePos = pos
                                     .multiply(new paper.Point(horizontalBlockSize, verticalBlockSize))
                                     .add(
@@ -431,7 +428,6 @@ class PlayerState {
                                     );
                                 this.gridGuideLine.position = tilePos;
                                 this.activePattern.position = tilePos;
-                            }
                         }
                         break;
                     }
@@ -489,7 +485,7 @@ class PlayerState {
         this.switchActiveState(ActiveState.Default);
     }
 
-    onEraser() {
+    onEraser(btnRaster?: paper.Group) {
 
         sound.buttonClick.pause();
         sound.buttonClick.currentTime = 0;
@@ -497,13 +493,35 @@ class PlayerState {
 
         if (this.activeState === ActiveState.Eraser) {
             this.onDefault();
+            btnRaster?.data.select(false);
             return;
         }
         this.switchPattern(null);
         this.switchActiveState(ActiveState.Eraser);
+        btnRaster?.data.select(true);
     }
 
-    onPaint() {
+    onPaint(btnRaster?: paper.Group) {
+        if (this.activePattern) {
+
+            if (this.tileState !== TileState.Default)
+                return;
+
+            sound.paintButton.pause();
+            sound.paintButton.currentTime = 0;
+            sound.paintButton.play();
+
+            for (let x = 0; x < horizontalBlocks; x++) {
+                for (let y = 0; y < verticalBlocks; y++) {
+                    if (this.tile[x + (y * horizontalBlocks)] === undefined) {
+                        const allPosition = new paper.Point(x, y);
+                        this.placePattern(this.activePattern.clone(), allPosition, this.activePattern.data.tileState);
+                    }
+                }
+            }
+            this.switchActiveState(ActiveState.Tile);
+            return;
+        }
 
         sound.buttonClick.pause();
         sound.buttonClick.currentTime = 0;
@@ -511,10 +529,12 @@ class PlayerState {
 
         if (this.activeState === ActiveState.Paint) {
             this.onDefault();
+            btnRaster?.data.select(false);
             return;
         }
         this.switchPattern(null);
         this.switchActiveState(ActiveState.Paint);
+        btnRaster?.data.select(true);
     }
 
     onReset() {
@@ -556,6 +576,8 @@ class PlayerState {
         this.tile       = new Array<number>();
         this.customTile = new Array<number>();
         this.trapTile   = new Array<number>();
+
+        this.onDefault();
     }
 }
 

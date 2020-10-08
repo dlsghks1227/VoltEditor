@@ -2,7 +2,7 @@ import paper from 'paper';
 
 import { layers }           from './layers';
 import { objectMap }        from './api/asyncObject';
-import { playerState, TileState }      from './state';
+import { ActiveState, playerState, TileState }      from './state';
 import { saveTileToFile }   from './save';
 import { 
     horizontalBlockSize,
@@ -34,7 +34,9 @@ import GuideLine        from './img/resources/Guide Line.png';
 import ArrowButton      from './img/resources/Arrow Button_ Default.png';
 import ResetButton      from './img/resources/Reset.png';
 import EraserButton     from './img/resources/Eraser.png';
+import EraserButtonSel  from './img/resources/Rotation_selected.png';
 import PaintButton      from './img/resources/Paint.png';
+import PaintButtonSel   from './img/resources/Rotation_selected.png';
 import RotationButton   from './img/resources/Rotation.png';
 import RotationBtnOff   from './img/resources/Rotation_X.png';
 import RotationBtnSel   from './img/resources/Rotation_selected.png';
@@ -45,22 +47,24 @@ import CopyImg          from './img/resources/Copy.png';
 
 import * as sound       from './sound';
 
-let invenCount:     number = 0;
-let tileGuideLine:  paper.Raster;
+let invenCount:         number = 0;
+let tileGuideLine:      paper.Raster;
 
-let activePattern:  any;
-let selectFolder:   boolean = false;
+let activePattern:      any;
+let selectFolder:       boolean = false;
 
-let folderGroup:    paper.Group;
-let folderPos:      number = -357;
+let folderGroup:        paper.Group;
+let folderPos:          number = -357;
 
-let exitGroup:      paper.Group;
-let invenGroup:     paper.Group;
+let exitGroup:          paper.Group;
+let invenGroup:         paper.Group;
 
-let leftArrowRaster:  paper.Group;
-let rightArrowRaster: paper.Group;
+let leftArrowRaster:    paper.Group;
+let rightArrowRaster:   paper.Group;
 
-let rotationRaster: paper.Group;
+let rotationRaster:     paper.Group;
+let eraserRaster:       paper.Group;
+let paintRaster:        paper.Group;
 
 export function createPatternUI(image: any, ptn: any){
     layers.uiLayer.activate();
@@ -97,11 +101,23 @@ export function createPatternUI(image: any, ptn: any){
                 const button = createButton(group.rasterize(), () => {
                     playerState.switchPattern(pattern);
 
-                    sound.buttonClick.pause();
-                    sound.buttonClick.currentTime = 0;
-                    sound.buttonClick.play();
+                    if (playerState.activeState === ActiveState.Paint)
+                    {
+                        sound.paintButton.pause();
+                        sound.paintButton.currentTime = 0;
+                        sound.paintButton.play();
+                    }
+                    else
+                    {
+                        sound.buttonClick.pause();
+                        sound.buttonClick.currentTime = 0;
+                        sound.buttonClick.play();
+                    }
 
                     rotationRaster.data.select(false);
+                    eraserRaster.data.select(false);
+                    paintRaster.data.select(false);
+
                     rotationRaster.data.disable((pattern.data.tileState === TileState.Trap));
 
                     if (tileGuideLine) {
@@ -272,6 +288,9 @@ function init() {
         rightArrowRaster.data.disable(true);
 
         rotationRaster.data.select(false);
+        eraserRaster.data.select(false);
+        paintRaster.data.select(false);
+
         rotationRaster.data.disable(false);
 
         playerState.onDefault();
@@ -330,34 +349,54 @@ export function DrawUI() {
     
     // Rotation Button
     const rotationIcon = new paper.Raster(RotationButton);
+    const rotationSelIcon = new paper.Raster(RotationBtnSel);
     const rotationOffIcon = new paper.Raster(RotationBtnOff);
-    const RotationSelIcon = new paper.Raster(RotationBtnSel);
     rotationRaster = createButton(rotationIcon, () => {
         playerState.onRotate(-90, rotationRaster);
-    }, rotationOffIcon, RotationSelIcon);
+
+        eraserRaster.data.select(false);
+        paintRaster.data.select(false);
+
+    }, rotationSelIcon, rotationOffIcon);
     rotationRaster.position = new paper.Point(-540, 220);
 
     // Eraser Button
     const eraserIcon = new paper.Raster(EraserButton);
-    const eraserRaster = createButton(eraserIcon, () => {
-        playerState.onEraser();
+    const eraserSelIcon = new paper.Raster(EraserButtonSel);
+    eraserRaster = createButton(eraserIcon, () => {
+        playerState.onEraser(eraserRaster);
+        if (tileGuideLine)
+            tileGuideLine.visible = false;
+
         rotationRaster.data.select(false);
-    });
+        paintRaster.data.select(false);
+
+    }, eraserSelIcon);
     eraserRaster.position = new paper.Point(-540, 330);
 
     // Paint Button
     const paintIcon = new paper.Raster(PaintButton);
-    const paintRaster = createButton(paintIcon, () => {
-        playerState.onPaint();
+    const paintSelIcon = new paper.Raster(PaintButtonSel);
+    paintRaster = createButton(paintIcon, () => {
+        playerState.onPaint(paintRaster);
+
         rotationRaster.data.select(false);
-    });
+        eraserRaster.data.select(false);
+
+    }, paintSelIcon);
     paintRaster.position = new paper.Point(540, 220);
 
     // Reset Button
     const resetIcon = new paper.Raster(ResetButton);
     const resetRaster = createButton(resetIcon, () => {
         playerState.onReset();
+
+        if (tileGuideLine)
+            tileGuideLine.visible = false;
+
         rotationRaster.data.select(false);
+        eraserRaster.data.select(false);
+        paintRaster.data.select(false);
     });
     resetRaster.position = new paper.Point(540, 330);
     
