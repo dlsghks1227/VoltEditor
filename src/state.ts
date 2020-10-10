@@ -117,17 +117,6 @@ class PlayerState {
                     }
                 }
             }
-
-            this.activePattern.applyMatrix  = false;
-            this.activePattern.visible      = false;
-
-            this.activePattern = null;
-
-            this.gridGuideLine.visible = true;
-            this.gridGuideLine2.visible = false;
-
-            this.switchActiveState(ActiveState.Default);
-            return;
         }
 
         switch (this.tileState) {

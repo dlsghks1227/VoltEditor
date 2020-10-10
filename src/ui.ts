@@ -34,9 +34,9 @@ import GuideLine        from './img/resources/Guide Line.png';
 import ArrowButton      from './img/resources/Arrow Button_ Default.png';
 import ResetButton      from './img/resources/Reset.png';
 import EraserButton     from './img/resources/Eraser.png';
-import EraserButtonSel  from './img/resources/Rotation_selected.png';
+import EraserButtonSel  from './img/resources/Eraser_selected.png';
 import PaintButton      from './img/resources/Paint.png';
-import PaintButtonSel   from './img/resources/Rotation_selected.png';
+import PaintButtonSel   from './img/resources/Paint_selected.png';
 import RotationButton   from './img/resources/Rotation.png';
 import RotationBtnOff   from './img/resources/Rotation_X.png';
 import RotationBtnSel   from './img/resources/Rotation_selected.png';
@@ -48,7 +48,7 @@ import CopyImg          from './img/resources/Copy.png';
 import * as sound       from './sound';
 
 let invenCount:         number = 0;
-let tileGuideLine:      paper.Raster;
+let tileGuideLine:      paper.Group;
 
 let activePattern:      any;
 let selectFolder:       boolean = false;
@@ -133,7 +133,17 @@ export function createPatternUI(image: any, ptn: any){
 
             if (!tileGuideLine)
             {
-                tileGuideLine = new paper.Raster(GuideLine);
+                const tileGuideLineIcon = new paper.Raster(GuideLine);
+                tileGuideLine = createButton(tileGuideLineIcon, () => {
+
+                    sound.buttonClick.pause();
+                    sound.buttonClick.currentTime = 0;
+                    sound.buttonClick.play();
+
+                    tileGuideLine.visible = false;
+                    playerState.onDefault();
+                });
+                
                 tileGuideLine.visible = false;
                 layers.uiLayer.addChild(tileGuideLine);
             }
