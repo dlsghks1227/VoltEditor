@@ -145,5 +145,4 @@ export function resizeLayers() {
 
     layers.logoLayer.position   = layerOffset;
     layers.logoLayer.scaling    = new paper.Point(scaleX, scaleY);
-
 }

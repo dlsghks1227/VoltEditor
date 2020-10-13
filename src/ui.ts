@@ -250,9 +250,19 @@ function init() {
 
     const logo = new paper.Raster(LogoImg);
     logo.position = new paper.Point(0, 1200);
-
+    
+    const copyGroup = new paper.Group();
     const copy  = new paper.Raster(CopyImg);
-    copy.position = new paper.Point(0, 1300);
+    const logoText = new paper.PointText({
+        point: [265, 4],
+        content: 'https://heidelbaer.de/impressum/',
+        fillColor: new paper.Color(1, 1, 1, 1),
+        fontWeight: 'bold',
+        fontSize: 20
+    });
+    //copyGroup.applyMatrix = false;
+    copyGroup.addChildren([copy, logoText.rasterize()]);
+    copyGroup.position = new paper.Point(0, 1300);
 
     folderGroup = new paper.Group();
     folderGroup.applyMatrix = false;
