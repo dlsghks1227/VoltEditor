@@ -13,6 +13,7 @@ import { layers } from './layers';
 import GuideLine from './img/resources/Guide Line.png';
 import GuideLine2 from './img/resources/Guide Line-2.png';
 
+
 import * as sound from './sound';
 
 export enum TileState {
@@ -270,6 +271,7 @@ class PlayerState {
 
                             const mousePos = layers.gridLayer.globalToLocal(event.point).divide(new paper.Point(horizontalBlockSize / 2, verticalBlockSize / 2));
                             const tilePos = isometric(pos, mousePos);
+
                             if (!this.trapTile[tilePos.x + (tilePos.y * horizontalBlocks)]) {
                                 this.placePattern(this.activePattern.clone(), tilePos, this.tileState);
                             } else {
@@ -333,13 +335,29 @@ class PlayerState {
                     sound.eraserButton.currentTime = 0;
                     sound.eraserButton.play();
 
-                    if (this.tile[pos.x + (pos.y * horizontalBlocks)]) {
-                        this.tile[pos.x + (pos.y * horizontalBlocks)].remove();
-                        this.tile[pos.x + (pos.y * horizontalBlocks)] = undefined;
+                    const tileMaxPos = pos.multiply(new paper.Point(horizontalBlockSize, verticalBlockSize));
+                    const mousePoint = layers.gridLayer.globalToLocal(event.point);
+                    const margin = 22;
+
+                    if (mousePoint.x > tileMaxPos.x + margin &&
+                        mousePoint.y > tileMaxPos.y + margin &&
+                        mousePoint.x < tileMaxPos.x + (horizontalBlockSize - margin) &&
+                        mousePoint.y < tileMaxPos.y + (verticalBlockSize - margin)) {
+                        if (this.tile[pos.x + (pos.y * horizontalBlocks)]) {
+                            this.tile[pos.x + (pos.y * horizontalBlocks)].remove();
+                            this.tile[pos.x + (pos.y * horizontalBlocks)] = undefined;
+                        }
+                        if (this.customTile[pos.x + (pos.y * horizontalBlocks)]) {
+                            this.customTile[pos.x + (pos.y * horizontalBlocks)].remove();
+                            this.customTile[pos.x + (pos.y * horizontalBlocks)] = undefined;
+                        }
+                        return;
                     }
-                    if (this.customTile[pos.x + (pos.y * horizontalBlocks)]) {
-                        this.customTile[pos.x + (pos.y * horizontalBlocks)].remove();
-                        this.customTile[pos.x + (pos.y * horizontalBlocks)] = undefined;
+                        const linePos = getWorldPositionToLine(layers.gridLayer.globalToLocal(event.point));
+                        const tilePos = isometric(linePos, mousePoint.divide(new paper.Point(horizontalBlockSize / 2, verticalBlockSize / 2)));
+                    if (this.trapTile[tilePos.x + (tilePos.y * horizontalBlocks)]) {
+                        this.trapTile[tilePos.x + (tilePos.y * horizontalBlocks)].remove();
+                        this.trapTile[tilePos.x + (tilePos.y * horizontalBlocks)] = undefined;
                     }
                 }
             } else if (this.activeState === ActiveState.Rotate) {
@@ -424,11 +442,53 @@ class PlayerState {
         }
         else if (this.activePattern === null) {
             const pos = getWorldPositionToGrid(layers.gridLayer.globalToLocal(event.point));
-            if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
-                const tilePos = pos
-                    .multiply(new paper.Point(horizontalBlockSize, verticalBlockSize))
-                    .add(new paper.Point((horizontalBlockSize / 2), (verticalBlockSize / 2)))
-                this.gridGuideLine.position = tilePos;
+
+            if (this.activeState === ActiveState.Eraser) {
+                if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
+
+                    const tileMaxPos = pos.multiply(new paper.Point(horizontalBlockSize, verticalBlockSize));
+                    const mousePoint = layers.gridLayer.globalToLocal(event.point);
+                    const margin = 15;
+
+                    // 일반 타일 선택
+                    if (mousePoint.x > tileMaxPos.x + margin &&
+                        mousePoint.y > tileMaxPos.y + margin &&
+                        mousePoint.x < tileMaxPos.x + (horizontalBlockSize - margin) &&
+                        mousePoint.y < tileMaxPos.y + (verticalBlockSize - margin)) {
+
+                        this.gridGuideLine.visible = true;
+                        this.gridGuideLine2.visible = false;
+
+                        const tilePos = pos
+                            .multiply(new paper.Point(horizontalBlockSize, verticalBlockSize))
+                            .add(new paper.Point((horizontalBlockSize / 2), (verticalBlockSize / 2)))
+                        this.gridGuideLine.position = tilePos;
+                    }
+                    else {
+                        // 트랩 타일 일 경우
+                        const linePos = getWorldPositionToLine(layers.gridLayer.globalToLocal(event.point));
+                        const tilePos = isometric(linePos, mousePoint.divide(new paper.Point(horizontalBlockSize / 2, verticalBlockSize / 2)));
+
+                        this.gridGuideLine.visible = false;
+                        this.gridGuideLine2.visible = true;
+
+                        if ((tilePos.x & 1) === 1) {
+                            this.gridGuideLine2.rotation = 90;
+                        } else {
+                            this.gridGuideLine2.rotation = 0;
+                        }
+                        const temp = tilePos.multiply(new paper.Point(horizontalBlockSize / 2, verticalBlockSize / 2));
+                        this.gridGuideLine2.position = temp;
+                    }
+                }
+            }
+            else {
+                if ((pos.x >= 0 && pos.x < horizontalBlocks) && (pos.y >= 0 && pos.y < verticalBlocks)) {
+                    const tilePos = pos
+                        .multiply(new paper.Point(horizontalBlockSize, verticalBlockSize))
+                        .add(new paper.Point((horizontalBlockSize / 2), (verticalBlockSize / 2)))
+                    this.gridGuideLine.position = tilePos;
+                }
             }
         }
     }

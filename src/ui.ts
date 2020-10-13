@@ -250,19 +250,26 @@ function init() {
 
     const logo = new paper.Raster(LogoImg);
     logo.position = new paper.Point(0, 1200);
-    
-    const copyGroup = new paper.Group();
+
     const copy  = new paper.Raster(CopyImg);
-    const logoText = new paper.PointText({
-        point: [265, 4],
+    const copyText = new paper.PointText({
+        point: [103, 1305],
         content: 'https://heidelbaer.de/impressum/',
         fillColor: new paper.Color(1, 1, 1, 1),
         fontWeight: 'bold',
         fontSize: 20
     });
-    //copyGroup.applyMatrix = false;
-    copyGroup.addChildren([copy, logoText.rasterize()]);
-    copyGroup.position = new paper.Point(0, 1300);
+    const copyButton = createButton(copyText.rasterize(), () => {
+        const element = document.createElement('a');
+        element.setAttribute('href', 'https://heidelbaer.de/impressum/');
+        element.setAttribute('target', '_blank');
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    });
+    copyText.remove();
+    copy.addChild(copyButton);
+    copy.position = new paper.Point(-162, 1300);
 
     folderGroup = new paper.Group();
     folderGroup.applyMatrix = false;
