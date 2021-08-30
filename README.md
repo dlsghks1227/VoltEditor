@@ -6,7 +6,7 @@
 
 ## Tech Stack
 - IDE: Visual Studio Code
-- Front-end: React(Typescript)
+- Front-end: React(Typescript), CSS
   - Using Library: Paper.js
 
 ## Images
